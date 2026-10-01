@@ -3,115 +3,60 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IA-Tutor AI</title>
+    <title>IA-Tutor AI | Fiji Industrial Arts</title>
     <link rel="stylesheet" href="styles.css" />
     <style>
-      .ia-library { margin-top: 18px; padding: 22px; border: 1px solid #d8dee8; border-radius: 16px; background: #fff; }
-      .ia-library.hidden { display: none; }
-      .ia-library-header { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; margin-bottom:16px; }
-      .ia-library-kicker { font-size:.78rem; font-weight:700; letter-spacing:.08em; }
-      .ia-library-header h2 { margin:5px 0; }
-      .ia-library-header p { margin:0; color:#596579; }
-      .ia-library-controls { margin-bottom:16px; }
-      .ia-library-controls input { width:100%; box-sizing:border-box; padding:12px 14px; border:1px solid #cbd3df; border-radius:10px; font-size:1rem; }
-      .ia-library-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px; }
-      .ia-year-card { border:1px solid #e0e5ed; border-radius:14px; padding:15px; background:#f8fafc; }
-      .ia-year-card h3 { margin-top:0; }
-      .ia-subject-card { background:#fff; border:1px solid #e3e7ee; border-radius:12px; padding:12px; margin-top:10px; }
-      .ia-subject-card h4 { margin:0 0 9px; }
-      .ia-topic-list { display:flex; flex-wrap:wrap; gap:6px; }
-      .ia-topic { border:1px solid #ccd5e2; background:#fff; border-radius:999px; padding:7px 9px; cursor:pointer; }
-      .ia-topic.selected { font-weight:700; }
-      .ia-resource-actions { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:11px; }
-      .ia-action { text-decoration:none; border:1px solid #d5dce7; background:#f5f7fa; color:inherit; border-radius:8px; padding:8px; cursor:pointer; text-align:center; font-size:.85rem; }
-      .ia-library-source { margin-top:18px; padding:12px; border-radius:10px; background:#f1f5f9; font-size:.85rem; color:#566174; }
-      .ia-library-source a { font-weight:600; }
-      .ia-empty { padding:20px; text-align:center; }
-      @media (max-width:600px) { .ia-library-header { flex-direction:column; } .ia-resource-actions { grid-template-columns:1fr; } }
+      .modern-hero{position:relative;overflow:hidden;margin-bottom:24px;padding:34px;border-radius:26px;background:linear-gradient(135deg,#0b2d4f,#0f4c81 55%,#1769aa);color:#fff;box-shadow:0 22px 50px rgba(15,76,129,.22)}
+      .modern-hero:after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-90px;top:-100px;background:rgba(255,255,255,.09)}
+      .hero-content{position:relative;z-index:1;max-width:760px}.hero-kicker{margin:0 0 8px;font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.82}.hero-title{margin:0;font-size:clamp(2.2rem,5vw,4rem);line-height:1.05}.hero-subtitle{margin:12px 0 0;max-width:650px;font-size:1.05rem;line-height:1.6;opacity:.92}.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.hero-action{border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:11px 15px;background:rgba(255,255,255,.12);color:#fff;font-weight:800;cursor:pointer}.hero-action.primary{background:#fff;color:#0b2d4f}.feature-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:24px}.feature-card{padding:17px;border-radius:16px;background:#fff;border:1px solid rgba(148,163,184,.25);box-shadow:0 10px 26px rgba(15,76,129,.08)}.feature-card .icon{font-size:1.45rem}.feature-card h3{margin:8px 0 4px;font-size:1rem;color:#0b2d4f}.feature-card p{margin:0;color:#5f6f86;font-size:.86rem;line-height:1.45}.home-ai{position:fixed;right:22px;bottom:22px;z-index:50;display:flex;align-items:center;gap:9px;padding:12px 16px;border:0;border-radius:999px;background:linear-gradient(135deg,#0f4c81,#4aa3ff);color:#fff;font-weight:800;box-shadow:0 14px 30px rgba(15,76,129,.3);cursor:pointer}.portfolio-card{margin-top:18px;padding:20px;border-radius:18px;background:linear-gradient(135deg,#f8fbff,#edf4ff);border:1px solid rgba(59,130,246,.18)}.portfolio-card h3{margin:0;color:#0b2d4f}.portfolio-card p{color:#5f6f86;line-height:1.5}.portfolio-actions{display:flex;gap:10px;flex-wrap:wrap}.portfolio-action{border:1px solid #cbd5e1;border-radius:10px;padding:10px 13px;background:#fff;color:#0b2d4f;font-weight:700;cursor:pointer}@media(max-width:900px){.feature-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.modern-hero{padding:25px 20px}.feature-grid{grid-template-columns:1fr}.home-ai{right:14px;bottom:14px}}
     </style>
   </head>
   <body>
     <div class="app-shell">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">Industrial Arts Technical Drawing Tutor</p>
-          <h1>IA-Tutor AI</h1>
+      <section class="modern-hero">
+        <div class="hero-content">
+          <p class="hero-kicker">🇫🇯 Fiji Industrial Arts • Smart Learning</p>
+          <h1 class="hero-title">IA-Tutor AI</h1>
+          <p class="hero-subtitle">Learn, practise, analyse technical drawings and build your digital portfolio — from Year 9 to Year 13.</p>
+          <div class="hero-actions">
+            <button type="button" class="hero-action primary" id="hero-ai-button">🤖 Ask AI Tutor</button>
+            <button type="button" class="hero-action" id="open-industrial-arts">🇫🇯 Industrial Arts Library</button>
+            <button type="button" class="hero-action" id="open-eportfolio">📁 My e-Portfolio</button>
+          </div>
         </div>
-        <button type="button" id="open-industrial-arts" class="secondary-button">🇫🇯 Industrial Arts Years 9–13</button>
+      </section>
+
+      <section class="feature-grid" aria-label="IA-Tutor features">
+        <article class="feature-card"><div class="icon">📐</div><h3>AI Drawing Solver</h3><p>Analyse technical drawing questions and generate orthographic views.</p></article>
+        <article class="feature-card"><div class="icon">📚</div><h3>Years 9–13 Library</h3><p>Explore Fiji Industrial Arts subjects, topics, resources and practice.</p></article>
+        <article class="feature-card"><div class="icon">📝</div><h3>Practice & Exams</h3><p>Work through original IA-Tutor questions and exam preparation.</p></article>
+        <article class="feature-card"><div class="icon">📁</div><h3>e-Portfolio</h3><p>Keep projects, drawings, evidence and learning progress in one place.</p></article>
+      </section>
+
+      <header class="topbar">
+        <div><p class="eyebrow">Industrial Arts Technical Drawing Tutor</p><h2>Learning Dashboard</h2></div>
       </header>
 
       <main class="layout">
         <section class="panel input-panel">
-          <div class="panel-header">
-            <h2>📷 Upload a Technical Drawing Question</h2>
-          </div>
-
-          <div class="upload-card">
-            <label class="upload-dropzone" for="question-image-input">
-              <input id="question-image-input" type="file" accept="image/png,image/jpeg,image/jpg" />
-              <span class="upload-label">Choose JPG, JPEG, or PNG image</span>
-            </label>
-
-            <div id="image-preview-wrapper" class="image-preview-wrapper hidden">
-              <img id="image-preview" alt="Uploaded question preview" />
-            </div>
-
-            <div class="button-row upload-actions">
-              <button type="button" id="analyse-button" class="primary-button">Analyse Question</button>
-            </div>
-          </div>
-
-          <div class="analysis-panel">
-            <h3>QUESTION ANALYSIS</h3>
-            <div id="analysis-mode-banner" class="analysis-mode-banner">DEMO ANALYSIS</div>
-            <div id="demo-analysis-banner" class="demo-analysis-banner">Demo Analysis — Vision AI not connected</div>
-            <dl id="analysis-results" class="analysis-results">
-              <div class="analysis-row"><dt>Drawing Type:</dt><dd id="analysis-drawing-type">-</dd></div>
-              <div class="analysis-row"><dt>Projection Type:</dt><dd id="analysis-projection-type">-</dd></div>
-              <div class="analysis-row"><dt>Units:</dt><dd id="analysis-units">-</dd></div>
-              <div class="analysis-row"><dt>Scale:</dt><dd id="analysis-scale">-</dd></div>
-              <div class="analysis-row"><dt>Overall Width:</dt><dd id="analysis-overall-width">-</dd></div>
-              <div class="analysis-row"><dt>Overall Height:</dt><dd id="analysis-overall-height">-</dd></div>
-              <div class="analysis-row"><dt>Overall Depth:</dt><dd id="analysis-overall-depth">-</dd></div>
-              <div class="analysis-row"><dt>Width:</dt><dd id="analysis-width">-</dd></div>
-              <div class="analysis-row"><dt>Height:</dt><dd id="analysis-height">-</dd></div>
-              <div class="analysis-row"><dt>Depth:</dt><dd id="analysis-depth">-</dd></div>
-              <div class="analysis-row"><dt>Views Required:</dt><dd id="analysis-views">-</dd></div>
-              <div class="analysis-row"><dt>Geometric Features:</dt><dd id="analysis-features">-</dd></div>
-              <div class="analysis-row"><dt>Difficulty:</dt><dd id="analysis-difficulty">-</dd></div>
-              <div class="analysis-row"><dt>Confidence:</dt><dd id="analysis-confidence">-</dd></div>
-              <div class="analysis-row"><dt>Explanation:</dt><dd id="analysis-explanation">-</dd></div>
-            </dl>
-            <div class="button-row generate-actions">
-              <button type="button" id="confirm-analysis-button" class="secondary-button">Confirm Analysis</button>
-              <button type="button" id="generate-drawing-button" class="secondary-button" disabled>Generate Drawing</button>
-            </div>
-          </div>
-
-          <div class="manual-solver">
-            <div class="panel-header"><h2>Technical Drawing Problem</h2></div>
-            <form id="drawing-form" class="input-form">
-              <div class="field-group"><label for="width">Width</label><div class="input-wrap"><input id="width" name="width" type="number" min="1" step="1" value="60" required /><span>mm</span></div></div>
-              <div class="field-group"><label for="height">Height</label><div class="input-wrap"><input id="height" name="height" type="number" min="1" step="1" value="40" required /><span>mm</span></div></div>
-              <div class="field-group"><label for="depth">Depth</label><div class="input-wrap"><input id="depth" name="depth" type="number" min="1" step="1" value="60" required /><span>mm</span></div></div>
-              <div class="button-row"><button type="submit" class="primary-button">Solve Drawing</button><button type="button" id="reset-button" class="secondary-button">Reset</button></div>
-            </form>
-          </div>
-          <div id="status-message" class="status-message" aria-live="polite"></div>
+          <div class="panel-header"><h2>📷 Upload a Technical Drawing Question</h2></div>
+          <div class="upload-card"><label class="upload-dropzone" for="question-image-input"><input id="question-image-input" type="file" accept="image/png,image/jpeg,image/jpg" /><span class="upload-label">Choose JPG, JPEG, or PNG image</span></label><div id="image-preview-wrapper" class="image-preview-wrapper hidden"><img id="image-preview" alt="Uploaded question preview" /></div><div class="button-row upload-actions"><button type="button" id="analyse-button" class="primary-button">Analyse Question</button></div></div>
+          <div class="analysis-panel"><h3>QUESTION ANALYSIS</h3><div id="analysis-mode-banner" class="analysis-mode-banner">DEMO ANALYSIS</div><div id="demo-analysis-banner" class="demo-analysis-banner">Demo Analysis — Vision AI not connected</div><dl id="analysis-results" class="analysis-results"><div class="analysis-row"><dt>Drawing Type:</dt><dd id="analysis-drawing-type">-</dd></div><div class="analysis-row"><dt>Projection Type:</dt><dd id="analysis-projection-type">-</dd></div><div class="analysis-row"><dt>Units:</dt><dd id="analysis-units">-</dd></div><div class="analysis-row"><dt>Scale:</dt><dd id="analysis-scale">-</dd></div><div class="analysis-row"><dt>Overall Width:</dt><dd id="analysis-overall-width">-</dd></div><div class="analysis-row"><dt>Overall Height:</dt><dd id="analysis-overall-height">-</dd></div><div class="analysis-row"><dt>Overall Depth:</dt><dd id="analysis-overall-depth">-</dd></div><div class="analysis-row"><dt>Width:</dt><dd id="analysis-width">-</dd></div><div class="analysis-row"><dt>Height:</dt><dd id="analysis-height">-</dd></div><div class="analysis-row"><dt>Depth:</dt><dd id="analysis-depth">-</dd></div><div class="analysis-row"><dt>Views Required:</dt><dd id="analysis-views">-</dd></div><div class="analysis-row"><dt>Geometric Features:</dt><dd id="analysis-features">-</dd></div><div class="analysis-row"><dt>Difficulty:</dt><dd id="analysis-difficulty">-</dd></div><div class="analysis-row"><dt>Confidence:</dt><dd id="analysis-confidence">-</dd></div><div class="analysis-row"><dt>Explanation:</dt><dd id="analysis-explanation">-</dd></div></dl><div class="button-row generate-actions"><button type="button" id="confirm-analysis-button" class="secondary-button">Confirm Analysis</button><button type="button" id="generate-drawing-button" class="secondary-button" disabled>Generate Drawing</button></div></div>
+          <div class="manual-solver"><div class="panel-header"><h2>Technical Drawing Problem</h2></div><form id="drawing-form" class="input-form"><div class="field-group"><label for="width">Width</label><div class="input-wrap"><input id="width" name="width" type="number" min="1" step="1" value="60" required /><span>mm</span></div></div><div class="field-group"><label for="height">Height</label><div class="input-wrap"><input id="height" name="height" type="number" min="1" step="1" value="40" required /><span>mm</span></div></div><div class="field-group"><label for="depth">Depth</label><div class="input-wrap"><input id="depth" name="depth" type="number" min="1" step="1" value="60" required /><span>mm</span></div></div><div class="button-row"><button type="submit" class="primary-button">Solve Drawing</button><button type="button" id="reset-button" class="secondary-button">Reset</button></div></form></div><div id="status-message" class="status-message" aria-live="polite"></div>
+          <section class="portfolio-card" id="eportfolio-panel"><h3>📁 My e-Portfolio</h3><p>Organise your Industrial Arts learning evidence, drawings, projects and achievements.</p><div class="portfolio-actions"><button class="portfolio-action" type="button">➕ Add Project</button><button class="portfolio-action" type="button">📷 Add Drawing</button><button class="portfolio-action" type="button">📄 Add Evidence</button></div></section>
         </section>
-
-        <section class="panel output-panel">
-          <div class="panel-header output-header"><div class="output-title-group"><h2>Orthographic Projection</h2><span id="drawing-type" class="drawing-type-badge">Drawing Type: Orthographic Projection</span></div></div>
-          <div class="button-row output-actions"><button type="button" id="download-button" class="download-button">Download Drawing</button></div>
-          <div class="views-grid"><article class="view-card"><h3>Front View</h3><div id="front-view" class="svg-container"></div></article><article class="view-card"><h3>Top View</h3><div id="top-view" class="svg-container"></div></article><article class="view-card"><h3>Right-Side View</h3><div id="right-side-view" class="svg-container"></div></article></div>
-          <div class="instructions-panel"><h3>Step-by-step Construction</h3><ol id="construction-steps" class="construction-steps"></ol></div>
-        </section>
+        <section class="panel output-panel"><div class="panel-header output-header"><div class="output-title-group"><h2>Orthographic Projection</h2><span id="drawing-type" class="drawing-type-badge">Drawing Type: Orthographic Projection</span></div></div><div class="button-row output-actions"><button type="button" id="download-button" class="download-button">Download Drawing</button></div><div class="views-grid"><article class="view-card"><h3>Front View</h3><div id="front-view" class="svg-container"></div></article><article class="view-card"><h3>Top View</h3><div id="top-view" class="svg-container"></div></article><article class="view-card"><h3>Right-Side View</h3><div id="right-side-view" class="svg-container"></div></article></div><div class="instructions-panel"><h3>Step-by-step Construction</h3><ol id="construction-steps" class="construction-steps"></ol></div></section>
       </main>
     </div>
-    <script type="module" src="js/main.js?v=5.12"></script>
+    <button type="button" class="home-ai" id="floating-ai-button">🤖 AI Tutor</button>
+    <script type="module" src="js/main.js?v=5.13"></script>
     <script type="module">
-      import { initIndustrialArtsLibrary } from './js/industrialArts.js?v=1.0';
+      import { initIndustrialArtsLibrary } from './js/industrialArts.js?v=1.1';
       document.getElementById('open-industrial-arts')?.addEventListener('click', initIndustrialArtsLibrary);
+      const ai = () => document.getElementById('question-image-input')?.scrollIntoView({behavior:'smooth'});
+      document.getElementById('hero-ai-button')?.addEventListener('click', ai);
+      document.getElementById('floating-ai-button')?.addEventListener('click', ai);
+      document.getElementById('open-eportfolio')?.addEventListener('click', () => document.getElementById('eportfolio-panel')?.scrollIntoView({behavior:'smooth'}));
     </script>
   </body>
 </html>
