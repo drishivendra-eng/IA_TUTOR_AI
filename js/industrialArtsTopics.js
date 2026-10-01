@@ -1,3 +1,5 @@
+import './industrialArtsQuestionBank.js';
+
 export const INDUSTRIAL_ARTS_TOPICS = {
   9: {
     'Basic Technology': ['Workshop Safety', 'Tools and Equipment', 'Materials and Properties', 'Basic Woodwork', 'Basic Metalwork', 'Basic Measurement'],
