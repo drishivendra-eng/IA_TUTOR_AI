@@ -9,7 +9,7 @@
     .agent-head{padding:18px 20px;background:linear-gradient(110deg,#0874dc,#4c22c8);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px}.agent-head h2{margin:0;font-size:1.1rem}.agent-head p{margin:4px 0 0;font-size:.78rem;opacity:.9}.agent-close{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:7px 10px;cursor:pointer}
     .agent-tabs{display:grid;grid-template-columns:1fr 1fr;padding:10px;border-bottom:1px solid #e2e8f0;gap:8px}.agent-tab{background:#f4f7fb;color:#29415e;border:1px solid #dce6f1;border-radius:10px;padding:10px;font-weight:800;cursor:pointer}.agent-tab.active{background:#e8f2ff;color:#0756b5;border-color:#a9c9ee}
     .agent-body{padding:16px;overflow:auto}.agent-panel{display:none}.agent-panel.active{display:block}.agent-messages{min-height:240px;max-height:350px;overflow:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:12px}.agent-msg{max-width:88%;padding:10px 12px;border-radius:14px;line-height:1.45;font-size:.9rem}.agent-msg.bot{align-self:flex-start;background:#edf5ff;color:#17385e}.agent-msg.user{align-self:flex-end;background:#0b67d8;color:#fff}.agent-compose{display:flex;gap:8px}.agent-compose textarea,.agent-live input,.agent-live textarea{width:100%;border:1px solid #cbd8e7;border-radius:11px;padding:11px;font:inherit;resize:vertical}.agent-compose textarea{min-height:48px}.agent-send{background:#0b67d8;color:#fff;border:0;border-radius:11px;padding:0 15px;font-weight:800;cursor:pointer}.agent-quick{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.agent-quick button{border:1px solid #d5e2ef;background:#fff;color:#1f466f;border-radius:999px;padding:7px 10px;font-size:.78rem;cursor:pointer}.agent-live{display:flex;flex-direction:column;gap:10px}.agent-live label{font-weight:700;color:#17385e;font-size:.82rem}.agent-live textarea{min-height:110px}.agent-live button{background:#0b67d8;color:#fff;border:0;border-radius:11px;padding:12px;font-weight:800;cursor:pointer}.agent-note{font-size:.76rem;color:#6b7d91;margin:0}.agent-status{font-size:.8rem;font-weight:700;color:#166534;min-height:18px}.agent-context{padding:9px 11px;border-radius:10px;background:#f7fbff;border:1px solid #dce9f5;color:#536a83;font-size:.78rem;margin-bottom:10px}
-    @media(max-width:600px){.agent-backdrop{padding:10px}.agent-window{width:100%;max-height:calc(100vh - 20px)}.agent-fab{right:12px;bottom:12px}}
+    @media(max-width:600px){.agent-backdrop{padding:10px}.agent-window{width:100%;max-height:calc(100vh - 20px)}}
   `;
   document.head.appendChild(style);
 
@@ -34,10 +34,12 @@
     </section>`;
   document.body.appendChild(backdrop);
 
-  const fab = document.createElement('button');
-  fab.className = 'agent-fab'; fab.type='button'; fab.textContent='🤖 AI Agent'; fab.setAttribute('aria-label','Open AI Agent and live agent support'); document.body.appendChild(fab);
+  const fab = document.getElementById('floating-ai-button') || document.getElementById('hero-ai-button');
+  if (fab) { fab.classList.add('agent-fab'); fab.textContent='🤖 AI Agent'; fab.setAttribute('aria-label','Open AI Agent and live agent support'); }
+  else { const newFab=document.createElement('button'); newFab.className='agent-fab'; newFab.type='button'; newFab.textContent='🤖 AI Agent'; document.body.appendChild(newFab); }
+  const launcher = fab || document.querySelector('.agent-fab');
   const close = () => backdrop.classList.remove('open');
-  fab.addEventListener('click', () => backdrop.classList.add('open'));
+  launcher.addEventListener('click', () => backdrop.classList.add('open'));
   backdrop.querySelector('.agent-close').addEventListener('click', close);
   backdrop.addEventListener('click', e => { if(e.target === backdrop) close(); });
   document.addEventListener('keydown', e => { if(e.key === 'Escape') close(); });
