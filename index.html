@@ -5,6 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>IA-Tutor AI</title>
     <link rel="stylesheet" href="styles.css" />
+    <style>
+      .ia-library { margin-top: 18px; padding: 22px; border: 1px solid #d8dee8; border-radius: 16px; background: #fff; }
+      .ia-library.hidden { display: none; }
+      .ia-library-header { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; margin-bottom:16px; }
+      .ia-library-kicker { font-size:.78rem; font-weight:700; letter-spacing:.08em; }
+      .ia-library-header h2 { margin:5px 0; }
+      .ia-library-header p { margin:0; color:#596579; }
+      .ia-library-controls { margin-bottom:16px; }
+      .ia-library-controls input { width:100%; box-sizing:border-box; padding:12px 14px; border:1px solid #cbd3df; border-radius:10px; font-size:1rem; }
+      .ia-library-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px; }
+      .ia-year-card { border:1px solid #e0e5ed; border-radius:14px; padding:15px; background:#f8fafc; }
+      .ia-year-card h3 { margin-top:0; }
+      .ia-subject-card { background:#fff; border:1px solid #e3e7ee; border-radius:12px; padding:12px; margin-top:10px; }
+      .ia-subject-card h4 { margin:0 0 9px; }
+      .ia-topic-list { display:flex; flex-wrap:wrap; gap:6px; }
+      .ia-topic { border:1px solid #ccd5e2; background:#fff; border-radius:999px; padding:7px 9px; cursor:pointer; }
+      .ia-topic.selected { font-weight:700; }
+      .ia-resource-actions { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:11px; }
+      .ia-action { text-decoration:none; border:1px solid #d5dce7; background:#f5f7fa; color:inherit; border-radius:8px; padding:8px; cursor:pointer; text-align:center; font-size:.85rem; }
+      .ia-library-source { margin-top:18px; padding:12px; border-radius:10px; background:#f1f5f9; font-size:.85rem; color:#566174; }
+      .ia-library-source a { font-weight:600; }
+      .ia-empty { padding:20px; text-align:center; }
+      @media (max-width:600px) { .ia-library-header { flex-direction:column; } .ia-resource-actions { grid-template-columns:1fr; } }
+    </style>
   </head>
   <body>
     <div class="app-shell">
@@ -13,7 +37,10 @@
           <p class="eyebrow">Industrial Arts Technical Drawing Tutor</p>
           <h1>IA-Tutor AI</h1>
         </div>
+        <button type="button" id="open-industrial-arts" class="secondary-button">🇫🇯 Industrial Arts Years 9–13</button>
       </header>
+
+      <section id="industrial-arts-library" class="ia-library hidden" aria-label="Fiji Industrial Arts library"></section>
 
       <main class="layout">
         <section class="panel input-panel">
@@ -41,68 +68,22 @@
             <div id="analysis-mode-banner" class="analysis-mode-banner">DEMO ANALYSIS</div>
             <div id="demo-analysis-banner" class="demo-analysis-banner">Demo Analysis — Vision AI not connected</div>
             <dl id="analysis-results" class="analysis-results">
-              <div class="analysis-row">
-                <dt>Drawing Type:</dt>
-                <dd id="analysis-drawing-type">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Projection Type:</dt>
-                <dd id="analysis-projection-type">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Units:</dt>
-                <dd id="analysis-units">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Scale:</dt>
-                <dd id="analysis-scale">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Overall Width:</dt>
-                <dd id="analysis-overall-width">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Overall Height:</dt>
-                <dd id="analysis-overall-height">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Overall Depth:</dt>
-                <dd id="analysis-overall-depth">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Width:</dt>
-                <dd id="analysis-width">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Height:</dt>
-                <dd id="analysis-height">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Depth:</dt>
-                <dd id="analysis-depth">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Views Required:</dt>
-                <dd id="analysis-views">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Geometric Features:</dt>
-                <dd id="analysis-features">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Difficulty:</dt>
-                <dd id="analysis-difficulty">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Confidence:</dt>
-                <dd id="analysis-confidence">-</dd>
-              </div>
-              <div class="analysis-row">
-                <dt>Explanation:</dt>
-                <dd id="analysis-explanation">-</dd>
-              </div>
+              <div class="analysis-row"><dt>Drawing Type:</dt><dd id="analysis-drawing-type">-</dd></div>
+              <div class="analysis-row"><dt>Projection Type:</dt><dd id="analysis-projection-type">-</dd></div>
+              <div class="analysis-row"><dt>Units:</dt><dd id="analysis-units">-</dd></div>
+              <div class="analysis-row"><dt>Scale:</dt><dd id="analysis-scale">-</dd></div>
+              <div class="analysis-row"><dt>Overall Width:</dt><dd id="analysis-overall-width">-</dd></div>
+              <div class="analysis-row"><dt>Overall Height:</dt><dd id="analysis-overall-height">-</dd></div>
+              <div class="analysis-row"><dt>Overall Depth:</dt><dd id="analysis-overall-depth">-</dd></div>
+              <div class="analysis-row"><dt>Width:</dt><dd id="analysis-width">-</dd></div>
+              <div class="analysis-row"><dt>Height:</dt><dd id="analysis-height">-</dd></div>
+              <div class="analysis-row"><dt>Depth:</dt><dd id="analysis-depth">-</dd></div>
+              <div class="analysis-row"><dt>Views Required:</dt><dd id="analysis-views">-</dd></div>
+              <div class="analysis-row"><dt>Geometric Features:</dt><dd id="analysis-features">-</dd></div>
+              <div class="analysis-row"><dt>Difficulty:</dt><dd id="analysis-difficulty">-</dd></div>
+              <div class="analysis-row"><dt>Confidence:</dt><dd id="analysis-confidence">-</dd></div>
+              <div class="analysis-row"><dt>Explanation:</dt><dd id="analysis-explanation">-</dd></div>
             </dl>
-
             <div class="button-row generate-actions">
               <button type="button" id="confirm-analysis-button" class="secondary-button">Confirm Analysis</button>
               <button type="button" id="generate-drawing-button" class="secondary-button" disabled>Generate Drawing</button>
@@ -110,82 +91,25 @@
           </div>
 
           <div class="manual-solver">
-            <div class="panel-header">
-              <h2>Technical Drawing Problem</h2>
-            </div>
-
+            <div class="panel-header"><h2>Technical Drawing Problem</h2></div>
             <form id="drawing-form" class="input-form">
-              <div class="field-group">
-                <label for="width">Width</label>
-                <div class="input-wrap">
-                  <input id="width" name="width" type="number" min="1" step="1" value="60" required />
-                  <span>mm</span>
-                </div>
-              </div>
-
-              <div class="field-group">
-                <label for="height">Height</label>
-                <div class="input-wrap">
-                  <input id="height" name="height" type="number" min="1" step="1" value="40" required />
-                  <span>mm</span>
-                </div>
-              </div>
-
-              <div class="field-group">
-                <label for="depth">Depth</label>
-                <div class="input-wrap">
-                  <input id="depth" name="depth" type="number" min="1" step="1" value="60" required />
-                  <span>mm</span>
-                </div>
-              </div>
-
-              <div class="button-row">
-                <button type="submit" class="primary-button">Solve Drawing</button>
-                <button type="button" id="reset-button" class="secondary-button">Reset</button>
-              </div>
+              <div class="field-group"><label for="width">Width</label><div class="input-wrap"><input id="width" name="width" type="number" min="1" step="1" value="60" required /><span>mm</span></div></div>
+              <div class="field-group"><label for="height">Height</label><div class="input-wrap"><input id="height" name="height" type="number" min="1" step="1" value="40" required /><span>mm</span></div></div>
+              <div class="field-group"><label for="depth">Depth</label><div class="input-wrap"><input id="depth" name="depth" type="number" min="1" step="1" value="60" required /><span>mm</span></div></div>
+              <div class="button-row"><button type="submit" class="primary-button">Solve Drawing</button><button type="button" id="reset-button" class="secondary-button">Reset</button></div>
             </form>
           </div>
-
           <div id="status-message" class="status-message" aria-live="polite"></div>
         </section>
 
         <section class="panel output-panel">
-          <div class="panel-header output-header">
-            <div class="output-title-group">
-              <h2>Orthographic Projection</h2>
-              <span id="drawing-type" class="drawing-type-badge">Drawing Type: Orthographic Projection</span>
-            </div>
-          </div>
-
-          <div class="button-row output-actions">
-            <button type="button" id="download-button" class="download-button">Download Drawing</button>
-          </div>
-
-          <div class="views-grid">
-            <article class="view-card">
-              <h3>Front View</h3>
-              <div id="front-view" class="svg-container"></div>
-            </article>
-
-            <article class="view-card">
-              <h3>Top View</h3>
-              <div id="top-view" class="svg-container"></div>
-            </article>
-
-            <article class="view-card">
-              <h3>Right-Side View</h3>
-              <div id="right-side-view" class="svg-container"></div>
-            </article>
-          </div>
-
-          <div class="instructions-panel">
-            <h3>Step-by-step Construction</h3>
-            <ol id="construction-steps" class="construction-steps"></ol>
-          </div>
+          <div class="panel-header output-header"><div class="output-title-group"><h2>Orthographic Projection</h2><span id="drawing-type" class="drawing-type-badge">Drawing Type: Orthographic Projection</span></div></div>
+          <div class="button-row output-actions"><button type="button" id="download-button" class="download-button">Download Drawing</button></div>
+          <div class="views-grid"><article class="view-card"><h3>Front View</h3><div id="front-view" class="svg-container"></div></article><article class="view-card"><h3>Top View</h3><div id="top-view" class="svg-container"></div></article><article class="view-card"><h3>Right-Side View</h3><div id="right-side-view" class="svg-container"></div></article></div>
+          <div class="instructions-panel"><h3>Step-by-step Construction</h3><ol id="construction-steps" class="construction-steps"></ol></div>
         </section>
       </main>
     </div>
-
-    <script type="module" src="js/main.js?v=5.11"></script>
+    <script type="module" src="js/main.js?v=5.12"></script>
   </body>
 </html>
