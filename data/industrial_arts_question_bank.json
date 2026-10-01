@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "source_note": "Starter original IA-Tutor practice bank. Official MOE exam papers are referenced separately and are not reproduced here.",
+  "questions": [
+    {"id":"Y9-BT-001","year":9,"subject":"Basic Technology","topic":"Workshop Safety","type":"practice","question":"State three important workshop safety rules.","answer":"Wear appropriate personal protective equipment, keep the work area clean, and use tools correctly according to their intended purpose."},
+    {"id":"Y9-BGT-001","year":9,"subject":"Basic Graphics Technology","topic":"Technical Drawing Instruments","type":"practice","question":"Name two instruments used for accurate technical drawing.","answer":"A drawing board and a set square are examples of technical drawing instruments."},
+    {"id":"Y10-BT-001","year":10,"subject":"Basic Technology","topic":"Materials","type":"practice","question":"Give two properties that should be considered when selecting a material for a product.","answer":"Examples include strength, durability, hardness, flexibility, weight and resistance to corrosion."},
+    {"id":"Y10-BGT-001","year":10,"subject":"Basic Graphics Technology","topic":"Scale","type":"practice","question":"What is the purpose of a drawing scale?","answer":"A scale allows an object to be represented proportionally at a size different from its actual size."},
+    {"id":"Y11-TD-001","year":11,"subject":"Technical Drawing","topic":"Orthographic Projection","type":"practice","question":"What are the three principal views commonly used to describe a three-dimensional object?","answer":"Front view, top view and right-side view are commonly used principal views."},
+    {"id":"Y11-AT-001","year":11,"subject":"Applied Technology","topic":"Workshop Practice","type":"practice","question":"Why should a workpiece be securely held before a cutting operation?","answer":"Secure holding prevents movement, improves accuracy and reduces the risk of injury."},
+    {"id":"Y12-TD-001","year":12,"subject":"Technical Drawing","topic":"Orthographic Projection","type":"practice","question":"An object has width 60 mm, height 40 mm and depth 60 mm. What are the overall dimensions of the front, top and right-side views?","answer":"Front: 60 × 40 mm. Top: 60 × 60 mm. Right-side: 60 × 40 mm."},
+    {"id":"Y12-AT-001","year":12,"subject":"Applied Technology","topic":"Design Process","type":"practice","question":"List four stages that may be included in a technology design process.","answer":"Identify the problem, investigate and generate ideas, develop and test a solution, and evaluate the final product."},
+    {"id":"Y13-TD-001","year":13,"subject":"Technical Drawing","topic":"Sectional Views","type":"practice","question":"Why are sectional views used in technical drawing?","answer":"They reveal internal features that may not be clearly visible in an external view."},
+    {"id":"Y13-AT-001","year":13,"subject":"Applied Technology","topic":"Product Evaluation","type":"practice","question":"Name three criteria that can be used to evaluate a designed product.","answer":"Function, safety, durability, cost, appearance, environmental impact and suitability are possible criteria."}
+  ]
+}
