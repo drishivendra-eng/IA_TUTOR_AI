@@ -4,23 +4,19 @@ export const DEFAULT_DRAWING_PROBLEM = {
   units: 'mm',
   scale: '1:1',
   overall_dimensions: {
-    width: { value: 60, unit: 'mm', confidence: 0.95 },
-    height: { value: 40, unit: 'mm', confidence: 0.95 },
-    depth: { value: 60, unit: 'mm', confidence: 0.95 },
+    width: { value: null, unit: 'mm', confidence: null },
+    height: { value: null, unit: 'mm', confidence: null },
+    depth: { value: null, unit: 'mm', confidence: null },
   },
   dimensions: {
-    width: 60,
-    height: 40,
-    depth: 60,
+    width: null,
+    height: null,
+    depth: null,
   },
   views_required: ['front', 'top', 'right'],
-  geometric_features: ['rectangular prism', 'orthographic projection'],
-  surfaces: ['front face', 'top face', 'right face'],
-  steps: [
-    'Draw the front elevation using width and height.',
-    'Extend the width into the top view and the depth into the side view.',
-    'Add dimension lines and final labels.'
-  ],
+  geometric_features: [],
+  surfaces: [],
+  steps: [],
   slopes: [],
   circles: [],
   arcs: [],
@@ -29,13 +25,13 @@ export const DEFAULT_DRAWING_PROBLEM = {
     'Use standard line conventions for outlines and projection lines.',
     'Label the front, top and right-side views clearly.'
   ],
-  difficulty: 'Beginner',
+  difficulty: null,
   confidence: {
-    overall: 0.95,
-    explanation: 'The dimensions and projection are clearly visible in the demo drawing.',
+    overall: null,
+    explanation: '',
   },
-  explanation: 'A standard orthographic projection problem with front, top and right-side views.',
-  confirmation_prompt: 'No confirmation required for this demo problem.',
+  explanation: '',
+  confirmation_prompt: 'Upload a drawing so AI can extract and verify the dimensions.',
   uncertain_measurements: [],
 };
 
@@ -96,8 +92,8 @@ export function validateDrawingProblem(problem) {
     };
   }
 
-  if (!problem.dimensions || !problem.dimensions.width || !problem.dimensions.height || !problem.dimensions.depth) {
-    issues.push('Missing required dimensions for width, height, or depth.');
+  if (!problem.dimensions || !Number.isFinite(problem.dimensions.width) || !Number.isFinite(problem.dimensions.height) || !Number.isFinite(problem.dimensions.depth)) {
+    issues.push('AI analysis must provide width, height, and depth before a drawing can be generated.');
   }
 
   if (problem.overall_dimensions) {
@@ -112,6 +108,6 @@ export function validateDrawingProblem(problem) {
     isValid: issues.length === 0,
     issues,
     problem,
-    confirmation_prompt: problem.confirmation_prompt || 'Please confirm this dimension.',
+    confirmation_prompt: problem.confirmation_prompt || 'Please confirm the AI-extracted dimensions.',
   };
 }
