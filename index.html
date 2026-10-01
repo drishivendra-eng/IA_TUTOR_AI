@@ -40,8 +40,6 @@
         <button type="button" id="open-industrial-arts" class="secondary-button">🇫🇯 Industrial Arts Years 9–13</button>
       </header>
 
-      <section id="industrial-arts-library" class="ia-library hidden" aria-label="Fiji Industrial Arts library"></section>
-
       <main class="layout">
         <section class="panel input-panel">
           <div class="panel-header">
@@ -111,5 +109,9 @@
       </main>
     </div>
     <script type="module" src="js/main.js?v=5.12"></script>
+    <script type="module">
+      import { initIndustrialArtsLibrary } from './js/industrialArts.js?v=1.0';
+      document.getElementById('open-industrial-arts')?.addEventListener('click', initIndustrialArtsLibrary);
+    </script>
   </body>
 </html>
