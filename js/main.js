@@ -175,11 +175,17 @@ function handleReset() {
 
 function handleDownload() {
   try {
-    const problem = parseProblem({
-      width: document.getElementById('width').value,
-      height: document.getElementById('height').value,
-      depth: document.getElementById('depth').value,
-    });
+    const problem = currentAnalysisProblem && analysisConfirmed
+      ? buildGeometryProblem(currentAnalysisProblem, {
+          width: document.getElementById('width').value,
+          height: document.getElementById('height').value,
+          depth: document.getElementById('depth').value,
+        })
+      : parseProblem({
+          width: document.getElementById('width').value,
+          height: document.getElementById('height').value,
+          depth: document.getElementById('depth').value,
+        });
 
     const svgMarkup = buildCompositeDownloadSvg(problem);
     const blob = new Blob([svgMarkup], { type: 'image/svg+xml;charset=utf-8' });

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { buildFeatureGeometry, buildGeometryProblem, buildConstructionSteps, normalizeDrawingDimensions, parseProblem } from './geometry.js';
-import { insertRenderedViews, renderViews } from './render.js';
+import { buildCompositeDownloadSvg, insertRenderedViews, renderViews } from './render.js';
 
 function makeProblem(overrides = {}) {
   return {
@@ -149,5 +149,11 @@ assert.match(domContainers.front.innerHTML, /<line/);
 assert.match(domContainers.top.innerHTML, /<polygon/);
 assert.match(domContainers.right.innerHTML, /<polygon/);
 assert.notEqual(domContainers.front.innerHTML, domContainers.right.innerHTML);
+
+const aiDownload = buildCompositeDownloadSvg(stackedProblem);
+assert.match(aiDownload, /<polygon/);
+assert.match(aiDownload, /20 mm base/);
+assert.match(aiDownload, /40 mm intermediate/);
+assert.ok((aiDownload.match(/<polygon/g) || []).length >= 4);
 
 console.log('geometry feature tests passed');

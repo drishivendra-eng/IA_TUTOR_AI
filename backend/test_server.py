@@ -5,8 +5,14 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
-import server
-from normalization import normalize_response_payload
+try:
+    import server
+except ModuleNotFoundError:
+    from backend import server
+try:
+    from normalization import normalize_response_payload
+except ModuleNotFoundError:
+    from backend.normalization import normalize_response_payload
 
 
 class TestServer(unittest.TestCase):
@@ -20,9 +26,10 @@ class TestServer(unittest.TestCase):
         self.assertEqual(response.json()['status'], 'ok')
 
     def test_analyze_drawing_returns_demo_when_key_missing(self):
+        png_bytes = b'\x89PNG\r\n\x1a\n' + b'test'
         response = self.client.post(
             '/api/analyze-drawing',
-            files={'image': ('sample.png', BytesIO(b'fakepngcontent'), 'image/png')},
+            files={'image': ('sample.png', BytesIO(png_bytes), 'image/png')},
         )
 
         self.assertEqual(response.status_code, 200)
@@ -40,7 +47,35 @@ class TestServer(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn('Unsupported image type', response.json()['detail'])
 
-    @patch('server.analyze_image_with_openai')
+    def test_analyze_drawing_rejects_empty_image(self):
+        response = self.client.post(
+            '/api/analyze-drawing',
+            files={'image': ('empty.png', BytesIO(b''), 'image/png')},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('empty', response.json()['detail'].lower())
+
+    def test_analyze_drawing_rejects_mismatched_image_content(self):
+        response = self.client.post(
+            '/api/analyze-drawing',
+            files={'image': ('wrong.png', BytesIO(b'not a png'), 'image/png')},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('does not match', response.json()['detail'])
+
+    def test_analyze_drawing_rejects_oversized_image(self):
+        oversized_png = b'\x89PNG\r\n\x1a\n' + b'x' * (server.MAX_IMAGE_BYTES + 1)
+        response = self.client.post(
+            '/api/analyze-drawing',
+            files={'image': ('large.png', BytesIO(oversized_png), 'image/png')},
+        )
+
+        self.assertEqual(response.status_code, 413)
+        self.assertIn('10 MiB', response.json()['detail'])
+
+    @patch.object(server, 'analyze_image_with_openai')
     def test_real_analysis_preserves_uploaded_mime_type(self, analyze_image):
         analyze_image.return_value = {
             'mode': 'real',
@@ -49,24 +84,26 @@ class TestServer(unittest.TestCase):
             'requires_confirmation': False,
         }
         os.environ['OPENAI_API_KEY'] = 'configured-for-test'
+        jpeg_bytes = b'\xff\xd8\xff' + b'test'
 
         response = self.client.post(
             '/api/analyze-drawing',
-            files={'image': ('sample.jpg', BytesIO(b'fakejpegcontent'), 'image/jpeg')},
+            files={'image': ('sample.jpg', BytesIO(jpeg_bytes), 'image/jpeg')},
         )
 
         self.assertEqual(response.status_code, 200)
         analyze_image.assert_called_once_with(
-            b'fakejpegcontent',
+            jpeg_bytes,
             'sample.jpg',
             'image/jpeg',
             'configured-for-test',
         )
 
     def test_demo_response_is_schema_validated(self):
+        jpeg_bytes = b'\xff\xd8\xff' + b'test'
         response = self.client.post(
             '/api/analyze-drawing',
-            files={'image': ('sample.jpeg', BytesIO(b'fakejpegcontent'), 'image/jpeg')},
+            files={'image': ('sample.jpeg', BytesIO(jpeg_bytes), 'image/jpeg')},
         )
 
         self.assertEqual(response.status_code, 200)

@@ -43,6 +43,19 @@ async def no_cache_frontend_assets(request, call_next):
     return response
 
 SUPPORTED_IMAGE_TYPES = {'image/jpeg', 'image/jpg', 'image/png'}
+MAX_IMAGE_BYTES = 10 * 1024 * 1024
+
+
+def validate_image_bytes(content_type: str, image_bytes: bytes) -> None:
+    if not image_bytes:
+        raise HTTPException(status_code=400, detail='The uploaded image is empty.')
+    if len(image_bytes) > MAX_IMAGE_BYTES:
+        raise HTTPException(status_code=413, detail='Image exceeds the 10 MiB upload limit.')
+
+    is_png = image_bytes.startswith(b'\x89PNG\r\n\x1a\n')
+    is_jpeg = image_bytes.startswith(b'\xff\xd8\xff')
+    if (content_type == 'image/png' and not is_png) or (content_type in {'image/jpeg', 'image/jpg'} and not is_jpeg):
+        raise HTTPException(status_code=400, detail='Image content does not match its declared JPG, JPEG, or PNG type.')
 
 
 def classify_provider_error(error: OpenAIProviderError) -> tuple[int, str]:
@@ -114,14 +127,15 @@ async def analyze_drawing(image: UploadFile = File(...)) -> DrawingProblemRespon
     if content_type not in SUPPORTED_IMAGE_TYPES:
         raise HTTPException(status_code=400, detail='Unsupported image type. Please upload a JPG, JPEG, or PNG image.')
 
+    image_bytes = await image.read(MAX_IMAGE_BYTES + 1)
+    validate_image_bytes(content_type, image_bytes)
+
     api_key = os.getenv('OPENAI_API_KEY')
     if not api_key:
         try:
             return build_demo_response()
         except ValidationError as exc:
             raise HTTPException(status_code=500, detail=f'Demo response validation failed: {exc}') from exc
-
-    image_bytes = await image.read()
 
     try:
         result = analyze_image_with_openai(
