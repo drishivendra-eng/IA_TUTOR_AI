@@ -3,7 +3,7 @@ let nextEntityId = 1;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 export class RealCadEngine {
-  constructor(svg) { this.svg = svg; this.entities = []; this.history = []; this.future = []; this.grid = 10; this.snap = true; }
+  constructor(svg) { this.svg = svg; this.entities = []; this.history = []; this.future = []; this.grid = 5; this.snap = true; }
   point(x, y) { const nx = Number(x), ny = Number(y); if (!Number.isFinite(nx) || !Number.isFinite(ny)) throw new Error('Invalid CAD point.'); return this.snap ? [Math.round(nx / this.grid) * this.grid, Math.round(ny / this.grid) * this.grid] : [nx, ny]; }
   snapshot() { return JSON.stringify(this.entities); }
   restore(value) { this.entities = JSON.parse(value || '[]'); this.render(); }
@@ -23,29 +23,42 @@ export class RealCadEngine {
   renderLine(e) { const n = document.createElementNS(SVG_NS, 'line'); n.classList.add('cad-entity'); n.setAttribute('x1', e.x1); n.setAttribute('y1', e.y1); n.setAttribute('x2', e.x2); n.setAttribute('y2', e.y2); if (e.construction) n.classList.add('cad-construction'); this.svg.appendChild(n); }
   renderPolyline(e) { const n = document.createElementNS(SVG_NS, 'polyline'); n.classList.add('cad-entity'); n.setAttribute('points', e.points.map((p) => p.join(',')).join(' ')); this.svg.appendChild(n); }
   renderCircle(e) { const n = document.createElementNS(SVG_NS, 'circle'); n.classList.add('cad-entity'); n.setAttribute('cx', e.cx); n.setAttribute('cy', e.cy); n.setAttribute('r', e.r); this.svg.appendChild(n); }
-  renderDimension(e) { const group = document.createElementNS(SVG_NS, 'g'); const line = document.createElementNS(SVG_NS, 'line'); line.classList.add('cad-dim-line'); line.setAttribute('x1', e.x1); line.setAttribute('y1', e.y1); line.setAttribute('x2', e.x2); line.setAttribute('y2', e.y2); const text = document.createElementNS(SVG_NS, 'text'); text.classList.add('cad-dim-text'); text.setAttribute('x', (e.x1 + e.x2) / 2); text.setAttribute('y', (e.y1 + e.y2) / 2 - 6); text.textContent = e.label; group.append(line, text); this.svg.appendChild(group); }
+  renderDimension(e) {
+    const group = document.createElementNS(SVG_NS, 'g');
+    const line = document.createElementNS(SVG_NS, 'line'); line.classList.add('cad-dim-line'); line.setAttribute('x1', e.x1); line.setAttribute('y1', e.y1); line.setAttribute('x2', e.x2); line.setAttribute('y2', e.y2);
+    const text = document.createElementNS(SVG_NS, 'text'); text.classList.add('cad-dim-text');
+    const vertical = Math.abs(e.x2 - e.x1) < Math.abs(e.y2 - e.y1);
+    let tx = (e.x1 + e.x2) / 2, ty = (e.y1 + e.y2) / 2 - 6;
+    if (vertical) { tx += 12; ty += 4; text.setAttribute('text-anchor', 'start'); }
+    text.setAttribute('x', tx); text.setAttribute('y', ty); text.textContent = e.label;
+    group.append(line, text); this.svg.appendChild(group);
+  }
 }
 
 export function buildAutomaticOrthographicCad(engine, { width, height, depth, units = 'mm' }) {
   const W = Number(width), H = Number(height), D = Number(depth);
   if (![W, H, D].every((v) => Number.isFinite(v) && v > 0)) throw new Error('AI must provide width, height and depth before CAD generation.');
   // Front = width × height; Top = width × depth; Right = depth × height.
-  // Scale automatically so common school/exam dimensions fit the browser canvas.
-  const gap = 70, margin = 55, canvasW = 900, canvasH = 600;
-  const scale = Math.min((canvasW - 2 * margin - D - gap) / (W + D), (canvasH - 2 * margin - H - D - gap) / (H + D), 2);
-  const s = Math.max(0.45, scale), w = W * s, h = H * s, d = D * s, ox = margin, oy = margin;
+  // Keep all three views large enough to read on a phone while reserving space for labels.
+  const canvasW = 900, canvasH = 600, gap = 110, margin = 90, rightReserve = 150, bottomReserve = 100;
+  const scale = Math.min((canvasW - 2 * margin - gap - rightReserve) / (W + D), (canvasH - 2 * margin - gap - bottomReserve) / (H + D));
+  const s = Math.max(0.65, Math.min(scale, 3));
+  const w = W * s, h = H * s, d = D * s;
+  const ox = margin, oy = margin;
   engine.clear();
   engine.rectangle(ox, oy, w, h); // Front
   engine.rectangle(ox, oy + h + gap, w, d); // Top
   engine.rectangle(ox + w + gap, oy, d, h); // Right
+  // Projection lines.
   engine.line(ox, oy + h, ox, oy + h + gap, { construction: true });
   engine.line(ox + w, oy + h, ox + w, oy + h + gap, { construction: true });
   engine.line(ox + w, oy, ox + w + gap, oy, { construction: true });
   engine.line(ox + w, oy + h, ox + w + gap, oy + h, { construction: true });
-  engine.dimension(ox, oy - 20, ox + w, oy - 20, `${W} ${units}`);
-  engine.dimension(ox - 20, oy, ox - 20, oy + h, `${H} ${units}`);
-  engine.dimension(ox, oy + h + d + 20, ox + w, oy + h + d + 20, `${W} ${units}`);
-  engine.dimension(ox + w + gap, oy - 20, ox + w + gap + d, oy - 20, `${D} ${units}`);
-  engine.dimension(ox + w + d + gap + 18, oy, ox + w + d + gap + 18, oy + h, `${H} ${units}`);
+  // Dimensions placed outside each view to prevent label collisions.
+  engine.dimension(ox, oy - 28, ox + w, oy - 28, `${W} ${units}`);
+  engine.dimension(ox - 32, oy, ox - 32, oy + h, `${H} ${units}`);
+  engine.dimension(ox, oy + h + d + 32, ox + w, oy + h + d + 32, `${W} ${units}`);
+  engine.dimension(ox + w + gap, oy - 28, ox + w + gap + d, oy - 28, `${D} ${units}`);
+  engine.dimension(ox + w + gap + d + 28, oy, ox + w + gap + d + 28, oy + h, `${H} ${units}`);
   return engine.entities;
 }
