@@ -1,3 +1,4 @@
+import './agent-widget.js';
 import { buildConstructionSteps, buildGeometryProblem, parseProblem } from './geometry.js';
 import { buildCompositeDownloadSvg, insertRenderedViews } from './render.js';
 import { createVisionAIService } from './visionAIService.js';
