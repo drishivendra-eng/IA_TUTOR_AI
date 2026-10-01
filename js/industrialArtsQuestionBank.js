@@ -97,3 +97,5 @@ export function initIndustrialArtsQuestionBank() {
     if (event.target.closest('.ia-topic, .ia-year-button, [data-subject]')) setTimeout(renderQuestionBank, 0);
   });
 }
+
+initIndustrialArtsQuestionBank();
