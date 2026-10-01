@@ -9,7 +9,9 @@
     .agent-head{padding:18px 20px;background:linear-gradient(110deg,#0874dc,#4c22c8);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:12px}.agent-head h2{margin:0;font-size:1.1rem}.agent-head p{margin:4px 0 0;font-size:.78rem;opacity:.9}.agent-close{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:7px 10px;cursor:pointer}
     .agent-tabs{display:grid;grid-template-columns:1fr 1fr;padding:10px;border-bottom:1px solid #e2e8f0;gap:8px}.agent-tab{background:#f4f7fb;color:#29415e;border:1px solid #dce6f1;border-radius:10px;padding:10px;font-weight:800;cursor:pointer}.agent-tab.active{background:#e8f2ff;color:#0756b5;border-color:#a9c9ee}
     .agent-body{padding:16px;overflow:auto}.agent-panel{display:none}.agent-panel.active{display:block}.agent-messages{min-height:240px;max-height:350px;overflow:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:12px}.agent-msg{max-width:88%;padding:10px 12px;border-radius:14px;line-height:1.45;font-size:.9rem}.agent-msg.bot{align-self:flex-start;background:#edf5ff;color:#17385e}.agent-msg.user{align-self:flex-end;background:#0b67d8;color:#fff}.agent-compose{display:flex;gap:8px}.agent-compose textarea,.agent-live input,.agent-live textarea{width:100%;border:1px solid #cbd8e7;border-radius:11px;padding:11px;font:inherit;resize:vertical}.agent-compose textarea{min-height:48px}.agent-send{background:#0b67d8;color:#fff;border:0;border-radius:11px;padding:0 15px;font-weight:800;cursor:pointer}.agent-quick{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}.agent-quick button{border:1px solid #d5e2ef;background:#fff;color:#1f466f;border-radius:999px;padding:7px 10px;font-size:.78rem;cursor:pointer}.agent-live{display:flex;flex-direction:column;gap:10px}.agent-live label{font-weight:700;color:#17385e;font-size:.82rem}.agent-live textarea{min-height:110px}.agent-live button{background:#0b67d8;color:#fff;border:0;border-radius:11px;padding:12px;font-weight:800;cursor:pointer}.agent-note{font-size:.76rem;color:#6b7d91;margin:0}.agent-status{font-size:.8rem;font-weight:700;color:#166534;min-height:18px}.agent-context{padding:9px 11px;border-radius:10px;background:#f7fbff;border:1px solid #dce9f5;color:#536a83;font-size:.78rem;margin-bottom:10px}
-    @media(max-width:600px){.agent-backdrop{padding:10px}.agent-window{width:100%;max-height:calc(100vh - 20px)}}
+    .human-escalation{display:none;margin:10px 0;padding:13px;border-radius:14px;border:1px solid #fecaca;background:linear-gradient(135deg,#fff7f7,#fff1f2);color:#7f1d1d}.human-escalation.open{display:block}.human-escalation strong{display:block;margin-bottom:5px}.human-escalation p{margin:0 0 10px;font-size:.82rem;line-height:1.4}.human-escalation button{width:100%;background:#dc2626;color:#fff;border:0;border-radius:10px;padding:11px;font-weight:800;cursor:pointer}.human-escalation button:hover{background:#b91c1c}
+    .human-alert{padding:10px 12px;border-radius:10px;background:#fff1f2;border:1px solid #fecaca;color:#991b1b;font-size:.8rem;font-weight:800;margin-bottom:10px}
+    @media(max-width:600px){.agent-backdrop{padding:10px}.agent-window{width:100%;max-height:calc(100vh - 20px)}.agent-fab{right:12px;bottom:12px}}
   `;
   document.head.appendChild(style);
 
@@ -18,56 +20,99 @@
   backdrop.innerHTML = `
     <section class="agent-window" role="dialog" aria-modal="true" aria-label="IA-Tutor support">
       <header class="agent-head"><div><h2>🤖 IA-Tutor Support</h2><p>Technical Drawing & Industrial Arts help</p></div><button class="agent-close" type="button" aria-label="Close">✕</button></header>
-      <nav class="agent-tabs"><button class="agent-tab active" data-tab="ai" type="button">🤖 Ask AI Agent</button><button class="agent-tab" data-tab="live" type="button">👨‍🏫 Ask a Live Agent</button></nav>
+      <nav class="agent-tabs"><button class="agent-tab active" data-tab="ai" type="button">🤖 Ask AI Agent</button><button class="agent-tab" data-tab="live" type="button">👨‍🏫 Human Help</button></nav>
       <div class="agent-body">
         <div class="agent-panel active" data-panel="ai">
           <div class="agent-context">Ask about Technical Drawing, AutoCAD-style construction, orthographic views, dimensions, Industrial Arts topics, or your current question.</div>
           <div class="agent-messages" id="agent-messages"><div class="agent-msg bot">Hello! I’m your IA-Tutor AI Agent. What Industrial Arts question can I help you solve?</div></div>
+          <div class="human-escalation" id="human-escalation"><strong>🚨 AI could not confidently solve this.</strong><p>Your question needs human attention. I’ll prepare an urgent message for <b>Rohil Dass</b> with your question.</p><button id="message-rohil" type="button">🚨 Message Rohil Dass — Urgent</button></div>
           <div class="agent-quick"><button type="button" data-q="How do I start an orthographic drawing?">Orthographic</button><button type="button" data-q="Explain the AutoCAD construction steps.">AutoCAD steps</button><button type="button" data-q="Help me with my Technical Drawing question.">My question</button></div>
           <div class="agent-compose"><textarea id="agent-input" placeholder="Type your question..."></textarea><button class="agent-send" id="agent-send" type="button">Send</button></div>
         </div>
         <div class="agent-panel" data-panel="live">
-          <div class="agent-context">Send a request to a teacher/support person. Your request stays in this app until a live-support channel is connected.</div>
-          <div class="agent-live"><label>Name<input id="live-name" placeholder="Your name" /></label><label>Question / Request<textarea id="live-message" placeholder="Describe what you need help with..."></textarea></label><button id="live-submit" type="button">📨 Request Live Agent</button><p class="agent-status" id="live-status"></p><p class="agent-note">For a real-time live chat, connect this form to your preferred support service or your app's backend endpoint.</p></div>
+          <div class="human-alert">🚨 HUMAN SUPPORT — Urgent questions are sent with priority.</div>
+          <div class="agent-context">If AI cannot solve your question, your question is automatically prepared here for <b>Rohil Dass</b>. The app can send it through your connected human-support endpoint.</div>
+          <div class="agent-live"><label>Name<input id="live-name" placeholder="Your name" /></label><label>Question / Request<textarea id="live-message" placeholder="Describe what you need help with..."></textarea></label><button id="live-submit" type="button">🚨 Message Rohil Dass</button><p class="agent-status" id="live-status"></p><p class="agent-note">Urgent human escalation is enabled in the interface. Connect your preferred support endpoint (email, WhatsApp, staff dashboard, or live chat) to deliver the message to Rohil Dass.</p></div>
         </div>
       </div>
     </section>`;
   document.body.appendChild(backdrop);
 
-  const fab = document.getElementById('floating-ai-button') || document.getElementById('hero-ai-button');
-  if (fab) { fab.classList.add('agent-fab'); fab.textContent='🤖 AI Agent'; fab.setAttribute('aria-label','Open AI Agent and live agent support'); }
-  else { const newFab=document.createElement('button'); newFab.className='agent-fab'; newFab.type='button'; newFab.textContent='🤖 AI Agent'; document.body.appendChild(newFab); }
-  const launcher = fab || document.querySelector('.agent-fab');
+  const existingFab = document.getElementById('floating-ai-button') || document.getElementById('hero-ai-button');
+  if (existingFab) { existingFab.classList.add('agent-fab'); existingFab.textContent='🤖 AI Agent'; existingFab.setAttribute('aria-label','Open AI Agent and human support'); }
+  else { const newFab=document.createElement('button'); newFab.className='agent-fab'; newFab.type='button'; newFab.textContent='🤖 AI Agent'; newFab.setAttribute('aria-label','Open AI Agent and human support'); document.body.appendChild(newFab); }
+  const launcher = existingFab || document.querySelector('.agent-fab');
   const close = () => backdrop.classList.remove('open');
   launcher.addEventListener('click', () => backdrop.classList.add('open'));
   backdrop.querySelector('.agent-close').addEventListener('click', close);
   backdrop.addEventListener('click', e => { if(e.target === backdrop) close(); });
   document.addEventListener('keydown', e => { if(e.key === 'Escape') close(); });
 
-  backdrop.querySelectorAll('.agent-tab').forEach(tab => tab.addEventListener('click', () => {
-    backdrop.querySelectorAll('.agent-tab').forEach(x=>x.classList.toggle('active',x===tab));
-    backdrop.querySelectorAll('.agent-panel').forEach(x=>x.classList.toggle('active',x.dataset.panel===tab.dataset.tab));
-  }));
+  const switchTab = name => {
+    backdrop.querySelectorAll('.agent-tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===name));
+    backdrop.querySelectorAll('.agent-panel').forEach(x=>x.classList.toggle('active',x.dataset.panel===name));
+  };
+  backdrop.querySelectorAll('.agent-tab').forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
 
   const messages = document.getElementById('agent-messages');
   const input = document.getElementById('agent-input');
+  const escalation = document.getElementById('human-escalation');
+  const liveName = document.getElementById('live-name');
+  const liveMessage = document.getElementById('live-message');
+  const liveStatus = document.getElementById('live-status');
+
+  const looksUnresolved = reply => {
+    const text = String(reply || '').toLowerCase();
+    return /cannot|can't|unable|not able|not sure|don't know|do not know|no answer|could not|couldn't|outside my|need human|human support|insufficient information|i need more information/.test(text);
+  };
+
+  const prepareHumanEscalation = question => {
+    escalation.classList.add('open');
+    liveMessage.value = `URGENT — AI could not confidently solve this question.\n\nStudent question:\n${question}`;
+    switchTab('live');
+    liveMessage.focus();
+  };
+
   const send = () => {
     const q = input.value.trim(); if(!q) return;
     const user = document.createElement('div'); user.className='agent-msg user'; user.textContent=q; messages.appendChild(user); input.value=''; messages.scrollTop=messages.scrollHeight;
     const bot = document.createElement('div'); bot.className='agent-msg bot'; bot.textContent='Thinking…'; messages.appendChild(bot); messages.scrollTop=messages.scrollHeight;
+    escalation.classList.remove('open');
     fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,context:'Fiji Industrial Arts Technical Drawing'})})
       .then(r=>r.ok?r.json():Promise.reject(new Error('AI endpoint unavailable')))
-      .then(data=>{bot.textContent=data.reply||data.message||'I received your question, but no answer was returned.';})
-      .catch(()=>{bot.textContent='I can help with Technical Drawing, orthographic projection, dimensions and AutoCAD-style construction. If you need a specific answer, enter the full question and I’ll use the drawing solver when possible.';});
+      .then(data=>{
+        const reply=data.reply||data.message||'';
+        bot.textContent=reply||'I could not return a reliable answer.';
+        if(data.escalate_to_human===true || data.needs_human===true || looksUnresolved(reply) || !reply) prepareHumanEscalation(q);
+      })
+      .catch(()=>{
+        bot.textContent='I could not reliably solve this question right now.';
+        prepareHumanEscalation(q);
+      });
   };
   send.addEventListener('click',send); input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
   backdrop.querySelectorAll('.agent-quick button').forEach(b=>b.addEventListener('click',()=>{input.value=b.dataset.q;input.focus();}));
 
-  document.getElementById('live-submit').addEventListener('click',()=>{
-    const name=document.getElementById('live-name').value.trim(); const message=document.getElementById('live-message').value.trim(); const status=document.getElementById('live-status');
-    if(!name||!message){status.style.color='#b91c1c';status.textContent='Please enter your name and question.';return;}
-    status.style.color='#166534'; status.textContent='Live-agent request prepared. Connect your support endpoint to send it automatically.';
-    const payload={name,message,source:'IA-Tutor live agent request',timestamp:new Date().toISOString()};
-    window.dispatchEvent(new CustomEvent('iaTutorLiveAgentRequest',{detail:payload}));
+  document.getElementById('message-rohil').addEventListener('click',()=>{
+    switchTab('live');
+    liveMessage.focus();
+    liveStatus.style.color='#991b1b';
+    liveStatus.textContent='Urgent message prepared for Rohil Dass. Press “Message Rohil Dass” to send through the connected support endpoint.';
+  });
+
+  document.getElementById('live-submit').addEventListener('click',async()=>{
+    const name=liveName.value.trim(); const message=liveMessage.value.trim();
+    if(!name||!message){liveStatus.style.color='#b91c1c';liveStatus.textContent='Please enter your name and question.';return;}
+    const payload={name,message,recipient:'Rohil Dass',priority:'URGENT',source:'IA-Tutor human escalation',timestamp:new Date().toISOString()};
+    liveStatus.style.color='#166534'; liveStatus.textContent='Sending urgent message to Rohil Dass…';
+    try {
+      const response=await fetch('/api/human-support',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      if(!response.ok) throw new Error('support endpoint unavailable');
+      liveStatus.textContent='✅ Urgent message sent to Rohil Dass.';
+    } catch(e) {
+      window.dispatchEvent(new CustomEvent('iaTutorLiveAgentRequest',{detail:payload}));
+      liveStatus.style.color='#9a3412';
+      liveStatus.textContent='⚠️ The urgent request is prepared, but the human-support endpoint is not connected yet.';
+    }
   });
 })();
