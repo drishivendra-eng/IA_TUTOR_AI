@@ -30,7 +30,10 @@ export const DEFAULT_DRAWING_PROBLEM = {
     'Label the front, top and right-side views clearly.'
   ],
   difficulty: 'Beginner',
-  confidence: 0.95,
+  confidence: {
+    overall: 0.95,
+    explanation: 'The dimensions and projection are clearly visible in the demo drawing.',
+  },
   explanation: 'A standard orthographic projection problem with front, top and right-side views.',
   confirmation_prompt: 'No confirmation required for this demo problem.',
   uncertain_measurements: [],

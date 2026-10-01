@@ -45,7 +45,7 @@ def analyze_image_with_openai(
                             '5. Estimate dimensions only when they are visible or reliably inferable.\n'
                             '6. Never invent a dimension if it is not visible or cannot be reliably inferred.\n'
                             '7. For any uncertain measurement, use value: null and confidence: 0 with source: not_visible.\n'
-                            '8. Provide a confidence value between 0 and 1 for important extracted information.\n'
+                            '8. Provide confidence as an object with overall (number from 0 to 1) and explanation (string).\n'
                             '9. Use field names exactly as the schema requires.\n'
                             '10. The response must be a valid JSON object, not Markdown.'
                         )
@@ -62,7 +62,7 @@ def analyze_image_with_openai(
                             'Return a structured DrawingProblem JSON object with these fields: '
                             'drawing_type, projection_type, units, scale, overall_dimensions, dimensions, views_required, '
                             'geometric_features, surfaces, steps, slopes, circles, arcs, construction_requirements, difficulty, '
-                            'confidence, explanation. '
+                            'confidence (with overall and explanation), explanation. '
                             'For any measurement that cannot be determined from the image, set value to null, confidence to 0, and note source as not_visible. '
                             'Do not invent dimensions that are not visible or reliably inferable.'
                         )

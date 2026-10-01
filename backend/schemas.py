@@ -8,6 +8,11 @@ class DimensionValue(BaseModel):
     source: str | None = Field(default=None)
 
 
+class ConfidenceResponse(BaseModel):
+    overall: float
+    explanation: str
+
+
 class DrawingProblem(BaseModel):
     drawing_type: str
     projection_type: str
@@ -24,7 +29,7 @@ class DrawingProblem(BaseModel):
     arcs: list[str] | None = None
     construction_requirements: list[str] | None = None
     difficulty: str | int | float | None = None
-    confidence: float
+    confidence: ConfidenceResponse
     explanation: str
 
     @model_validator(mode='before')

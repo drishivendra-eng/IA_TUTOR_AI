@@ -128,7 +128,10 @@ class TestServer(unittest.TestCase):
                 'arcs': [],
                 'construction_requirements': None,
                 'difficulty': None,
-                'confidence': 0.8,
+                'confidence': {
+                    'overall': 0.8,
+                    'explanation': 'Some values were not visible.',
+                },
                 'explanation': 'Some values were not visible.',
             },
         })

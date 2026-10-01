@@ -20,7 +20,13 @@ globalThis.fetch = async (url, init) => {
     text: async () => JSON.stringify({
       mode: 'real',
       message: 'REAL AI ANALYSIS',
-      problem: { drawing_type: 'test', projection_type: 'orthographic', units: 'mm', confidence: 1, explanation: 'test' },
+      problem: {
+        drawing_type: 'test',
+        projection_type: 'orthographic',
+        units: 'mm',
+        confidence: { overall: 1, explanation: 'test' },
+        explanation: 'test',
+      },
     }),
   };
 };

@@ -63,13 +63,14 @@ def _normalize_dimension(value: Any, unit: str | None, confidence: float) -> dic
 def normalize_drawing_problem(problem: dict[str, Any]) -> dict[str, Any]:
     normalized = dict(problem)
     units = normalized.get('units')
-    confidence = normalized.get('confidence', 0.0)
-    if not isinstance(confidence, (int, float)):
-        confidence = 0.0
+    confidence = normalized.get('confidence') or {}
+    confidence_overall = confidence.get('overall', 0.0) if isinstance(confidence, dict) else 0.0
+    if not isinstance(confidence_overall, (int, float)):
+        confidence_overall = 0.0
 
     overall_dimensions = normalized.get('overall_dimensions') or {}
     normalized['overall_dimensions'] = {
-        name: _normalize_dimension(overall_dimensions.get(name), units, float(confidence))
+        name: _normalize_dimension(overall_dimensions.get(name), units, float(confidence_overall))
         for name in DIMENSION_NAMES
     }
 

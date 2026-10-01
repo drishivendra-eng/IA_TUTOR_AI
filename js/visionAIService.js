@@ -60,7 +60,10 @@ function getDemoAnalysisProblem(fileName = 'uploaded-question.png') {
         'Add dimension lines with arrowheads.'
       ],
       difficulty: 'Beginner',
-      confidence: 0.92,
+      confidence: {
+        overall: 0.92,
+        explanation: 'The cube shape and equal dimensions are clearly visible in the demo drawing.',
+      },
       explanation: 'Demo analysis detected a cube-shaped object using a simple mock vision pass. The dimensions are estimated for testing and should be confirmed by the student if needed.',
       confirmation_prompt: 'Please confirm this dimension.',
       uncertain_measurements: ['width', 'height', 'depth'],
@@ -99,7 +102,10 @@ function getDemoAnalysisProblem(fileName = 'uploaded-question.png') {
       'Label the front, top and right-side views clearly.'
     ],
     difficulty: 'Beginner',
-    confidence: 0.95,
+    confidence: {
+      overall: 0.95,
+      explanation: 'The dimensions and projection are clearly visible in the demo drawing.',
+    },
     explanation: 'Demo analysis detected a standard rectangular object with front, top and right-side orthographic views. This structured result is suitable for deterministic SVG drawing generation.',
     confirmation_prompt: 'No confirmation required for this demo problem.',
     uncertain_measurements: [],

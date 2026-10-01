@@ -109,7 +109,10 @@ def build_demo_response() -> DrawingProblemResponse:
                 'Label the front, top and right-side views clearly.'
             ],
             'difficulty': 'Beginner',
-            'confidence': 0.95,
+            'confidence': {
+                'overall': 0.95,
+                'explanation': 'The dimensions and projection are clearly visible in the demo drawing.',
+            },
             'explanation': 'OpenAI key is not configured, so the backend returned the demo problem structure for testing.',
         },
         'requires_confirmation': False,

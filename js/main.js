@@ -86,7 +86,7 @@ function populateAnalysisPanel(problem) {
   analysisViews.textContent = problem.views_required?.join(', ') || 'Not visible';
   analysisFeatures.textContent = problem.geometric_features?.join(', ') || 'None reported';
   analysisDifficulty.textContent = problem.difficulty;
-  analysisConfidence.textContent = `${problem.confidence}`;
+  analysisConfidence.textContent = `${problem.confidence?.overall ?? 0}`;
   analysisExplanation.textContent = problem.explanation;
   analysisModeBanner.textContent = visionAIService.label;
 }
