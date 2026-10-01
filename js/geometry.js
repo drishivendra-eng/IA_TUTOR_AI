@@ -1,6 +1,6 @@
 export const DEFAULT_PROBLEM = {
-  width: 120,
-  height: 80,
+  width: 60,
+  height: 40,
   depth: 60,
 };
 

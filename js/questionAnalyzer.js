@@ -2,8 +2,8 @@ import { createDrawingProblem } from './drawingProblem.js';
 
 function getMockAnalysisFromImage(fileName = 'uploaded-question.png') {
   const normalizedName = fileName.toLowerCase();
-  const width = 120;
-  const height = 80;
+  const width = 60;
+  const height = 40;
   const depth = 60;
 
   if (normalizedName.includes('cube') || normalizedName.includes('block')) {

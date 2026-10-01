@@ -4,13 +4,13 @@ export const DEFAULT_DRAWING_PROBLEM = {
   units: 'mm',
   scale: '1:1',
   overall_dimensions: {
-    width: { value: 120, unit: 'mm', confidence: 0.95 },
-    height: { value: 80, unit: 'mm', confidence: 0.95 },
+    width: { value: 60, unit: 'mm', confidence: 0.95 },
+    height: { value: 40, unit: 'mm', confidence: 0.95 },
     depth: { value: 60, unit: 'mm', confidence: 0.95 },
   },
   dimensions: {
-    width: 120,
-    height: 80,
+    width: 60,
+    height: 40,
     depth: 60,
   },
   views_required: ['front', 'top', 'right'],
