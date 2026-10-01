@@ -67,10 +67,27 @@ python -m unittest backend/test_server.py
 
 ## Deployment
 
-Deploy the FastAPI application as the single web service, bind it to `0.0.0.0`, and use the port required by the hosting platform (port 8000 in this project’s Codespaces setup). Install dependencies from `backend/requirements.txt`, configure `OPENAI_API_KEY` using the host’s secret/environment-variable settings, and enable HTTPS. Do not upload `.env` as a public artifact or commit it.
+The project is configured as one Render web service: FastAPI serves the frontend and `/api/*` from the same origin. This avoids cross-origin browser requests and keeps the API key on the server. `render.yaml` defines the service, Python version, build/start commands, health check, and a dashboard-managed `OPENAI_API_KEY` variable.
 
-For production, use a persistent application host with health checks, request logging that excludes credentials and image contents, and appropriate upload-size limits. The current backend accepts PNG/JPEG MIME types and returns structured JSON errors.
+### Render Dashboard Setup
 
-## Custom Domain: rohilaitutor.com
+1. Push the deployment branch to GitHub if it is not already available there.
+2. In Render, choose **New** → **Blueprint**, connect the `IA_TUTOR_AI` GitHub repository, and select the deployment branch.
+3. Review the `ia-tutor-ai` web service from `render.yaml`. The configured `starter` plan is intended for an always-on production service; select a different plan only if its availability and sleep behavior suit your use.
+4. Create the service. In its **Environment** settings, enter the value for the variable named `OPENAI_API_KEY` using Render's secret environment-variable field. Never put the key in this repository, the Blueprint, a browser setting, or DNS.
+5. Deploy and wait for the service health check at `/api/health` to pass. Test the generated Render URL at `/` and `/api/health` before configuring a custom domain.
 
-Use a production host that supports custom domains; a Codespaces forwarded URL is for development and is not a production domain target. Add `rohilaitutor.com` (and optionally `www.rohilaitutor.com`) in the hosting provider’s domain settings, copy the provider’s required DNS records into the domain registrar’s DNS panel, wait for DNS propagation, and enable the provider-managed TLS certificate. Keep the frontend and API behind the same HTTPS origin so relative `/api/*` requests continue to work. Configure secrets on the hosting provider, not in DNS or frontend code.
+Render provides HTTPS for its service hostname and provisions HTTPS certificates for verified custom domains. Keep frontend and API on the same service/origin. The app binds to `0.0.0.0` and uses Render's injected `PORT` value.
+
+### Namecheap Custom Domain: rohilaitutor.com
+
+Do not change DNS until the Render service is deployed and healthy.
+
+1. In the Render service dashboard, open **Settings** → **Custom Domains** and add `rohilaitutor.com`. Add `www.rohilaitutor.com` too if you want both hostnames.
+2. In Namecheap, open **Domain List** → **Manage** for `rohilaitutor.com` → **Advanced DNS** → **Host Records**.
+3. Add the apex record shown by Render. For Render's standard IPv4 apex target, this is an **A Record** with **Host** `@` and **Value** `216.24.57.1`. If Render displays a different target in the domain instructions, use the current dashboard value instead.
+4. If using `www`, add a **CNAME Record** with **Host** `www` and **Value** equal to the exact `*.onrender.com` service hostname shown on the Render service page (without `https://` or a path).
+5. Remove conflicting Namecheap parking/URL-redirect records or duplicate `@`/`www` records, save the DNS changes, and wait for Render to verify the domain and issue its managed TLS certificate.
+6. In Render, choose the preferred canonical hostname and verify both the website and `/api/health` over HTTPS. Because requests use relative paths, the API remains on that same origin.
+
+DNS propagation and certificate issuance can take time. Do not publish credentials in DNS records or commit `.env`; configure secrets only in Render's environment settings.
