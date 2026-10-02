@@ -7,25 +7,23 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 try:
     from backend.vision_service import OpenAIProviderError, analyze_image_with_openai
     from backend.schemas import DrawingProblemResponse
     from backend.normalization import normalize_response_payload
-except ImportError:  # pragma: no cover - fallback for direct script execution
+    from backend.research_service import research
+except ImportError:
     from vision_service import OpenAIProviderError, analyze_image_with_openai
     from schemas import DrawingProblemResponse
     from normalization import normalize_response_payload
+    from research_service import research
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-
 load_dotenv(PROJECT_ROOT / '.env')
 
 app = FastAPI(title='IA-Tutor AI Backend')
-
-# Same-origin architecture: the frontend and API are served from one origin, so
-# cross-origin requests from the browser are no longer required for normal use.
 app.add_middleware(
     CORSMiddleware,
     allow_origin_regex=r'^https://.*-8000\.app\.github\.dev$|^http://(localhost|127\.0\.0\.1)(:\d+)?$',
@@ -33,7 +31,6 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
-
 
 @app.middleware('http')
 async def no_cache_frontend_assets(request, call_next):
@@ -51,7 +48,6 @@ def validate_image_bytes(content_type: str, image_bytes: bytes) -> None:
         raise HTTPException(status_code=400, detail='The uploaded image is empty.')
     if len(image_bytes) > MAX_IMAGE_BYTES:
         raise HTTPException(status_code=413, detail='Image exceeds the 10 MiB upload limit.')
-
     is_png = image_bytes.startswith(b'\x89PNG\r\n\x1a\n')
     is_jpeg = image_bytes.startswith(b'\xff\xd8\xff')
     if (content_type == 'image/png' and not is_png) or (content_type in {'image/jpeg', 'image/jpg'} and not is_jpeg):
@@ -61,7 +57,6 @@ def validate_image_bytes(content_type: str, image_bytes: bytes) -> None:
 def classify_provider_error(error: OpenAIProviderError) -> tuple[int, str]:
     error_type = error.error_type.lower()
     error_code = error.error_code.lower()
-
     if error.status_code in (401, 403) or 'auth' in error_type or 'api_key' in error_code:
         return 502, 'AUTHENTICATION_ERROR'
     if error.status_code == 429 and ('quota' in error_type or 'credit' in error_code):
@@ -79,44 +74,24 @@ def classify_provider_error(error: OpenAIProviderError) -> tuple[int, str]:
 
 def build_demo_response() -> DrawingProblemResponse:
     return DrawingProblemResponse.model_validate(normalize_response_payload({
-        'mode': 'demo',
-        'message': 'Vision AI is not configured. Using Demo Analysis.',
+        'mode': 'demo', 'message': 'Vision AI is not configured. Using Demo Analysis.',
         'problem': {
-            'drawing_type': 'orthographic_projection',
-            'projection_type': 'orthographic',
-            'units': 'mm',
-            'scale': '1:1',
-            'overall_dimensions': {
-                'width': {'value': 60, 'unit': 'mm', 'confidence': 0.95},
-                'height': {'value': 40, 'unit': 'mm', 'confidence': 0.95},
-                'depth': {'value': 60, 'unit': 'mm', 'confidence': 0.95},
-            },
-            'dimensions': {'width': 60, 'height': 40, 'depth': 60},
-            'views_required': ['front', 'top', 'right'],
-            'geometric_features': ['rectangular prism', 'orthographic projection'],
-            'surfaces': ['front face', 'top face', 'right face'],
-            'steps': [
-                'Draw the front elevation using width and height.',
-                'Extend the width into the top view and the depth into the side view.',
-                'Add dimension lines and final labels.'
-            ],
-            'slopes': [],
-            'circles': [],
-            'arcs': [],
-            'construction_requirements': [
-                'Maintain alignment between all three views.',
-                'Use standard line conventions for outlines and projection lines.',
-                'Label the front, top and right-side views clearly.'
-            ],
-            'difficulty': 'Beginner',
-            'confidence': {
-                'overall': 0.95,
-                'explanation': 'The dimensions and projection are clearly visible in the demo drawing.',
-            },
-            'explanation': 'OpenAI key is not configured, so the backend returned the demo problem structure for testing.',
-        },
-        'requires_confirmation': False,
+            'drawing_type': 'orthographic_projection', 'projection_type': 'orthographic', 'units': 'mm', 'scale': '1:1',
+            'overall_dimensions': {'width': {'value': 60, 'unit': 'mm', 'confidence': 0.95}, 'height': {'value': 40, 'unit': 'mm', 'confidence': 0.95}, 'depth': {'value': 60, 'unit': 'mm', 'confidence': 0.95}},
+            'dimensions': {'width': 60, 'height': 40, 'depth': 60}, 'views_required': ['front', 'top', 'right'],
+            'geometric_features': ['rectangular prism', 'orthographic projection'], 'surfaces': ['front face', 'top face', 'right face'],
+            'steps': ['Draw the front elevation using width and height.', 'Extend the width into the top view and the depth into the side view.', 'Add dimension lines and final labels.'],
+            'slopes': [], 'circles': [], 'arcs': [], 'construction_requirements': ['Maintain alignment between all three views.', 'Use standard line conventions for outlines and projection lines.', 'Label the front, top and right-side views clearly.'],
+            'difficulty': 'Beginner', 'confidence': {'overall': 0.95, 'explanation': 'The dimensions and projection are clearly visible in the demo drawing.'},
+            'explanation': 'OpenAI key is not configured, so the backend returned the demo problem structure for testing.'
+        }, 'requires_confirmation': False,
     }))
+
+
+class ResearchRequest(BaseModel):
+    question: str
+    year: str = 'Year 9'
+    subject: str = 'Industrial Arts'
 
 
 @app.get('/api/health')
@@ -124,29 +99,34 @@ async def health() -> dict[str, Any]:
     return {'status': 'ok'}
 
 
+@app.post('/api/research')
+async def research_endpoint(request: ResearchRequest) -> dict[str, Any]:
+    question = request.question.strip()
+    if len(question) < 3:
+        raise HTTPException(status_code=400, detail='Please enter a research question.')
+    if len(question) > 1000:
+        raise HTTPException(status_code=400, detail='Research question is too long.')
+    try:
+        return research(question, request.year, request.subject)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail='RESEARCH_SEARCH_ERROR') from exc
+
+
 @app.post('/api/analyze-drawing', response_model=DrawingProblemResponse)
 async def analyze_drawing(image: UploadFile = File(...)) -> DrawingProblemResponse:
     content_type = (image.content_type or '').lower()
     if content_type not in SUPPORTED_IMAGE_TYPES:
         raise HTTPException(status_code=400, detail='Unsupported image type. Please upload a JPG, JPEG, or PNG image.')
-
     image_bytes = await image.read(MAX_IMAGE_BYTES + 1)
     validate_image_bytes(content_type, image_bytes)
-
     api_key = os.getenv('OPENAI_API_KEY')
     if not api_key:
         try:
             return build_demo_response()
         except ValidationError as exc:
             raise HTTPException(status_code=500, detail=f'Demo response validation failed: {exc}') from exc
-
     try:
-        result = analyze_image_with_openai(
-            image_bytes,
-            image.filename or 'drawing.png',
-            content_type,
-            api_key,
-        )
+        result = analyze_image_with_openai(image_bytes, image.filename or 'drawing.png', content_type, api_key)
         return DrawingProblemResponse.model_validate(normalize_response_payload(result))
     except ValidationError as exc:
         raise HTTPException(status_code=502, detail=f'Vision response validation failed: {exc}') from exc
@@ -157,14 +137,19 @@ async def analyze_drawing(image: UploadFile = File(...)) -> DrawingProblemRespon
         raise HTTPException(status_code=502, detail='PROVIDER_ERROR') from exc
 
 
-# Static frontend assets, mounted after the /api routes so they never shadow the API.
 app.mount('/js', StaticFiles(directory=PROJECT_ROOT / 'js'), name='js')
-
 
 @app.get('/styles.css')
 async def styles() -> FileResponse:
     return FileResponse(PROJECT_ROOT / 'styles.css')
 
+@app.get('/library.html')
+async def library() -> FileResponse:
+    return FileResponse(PROJECT_ROOT / 'library.html')
+
+@app.get('/research.html')
+async def research_page() -> FileResponse:
+    return FileResponse(PROJECT_ROOT / 'research.html')
 
 @app.get('/')
 async def index() -> FileResponse:
