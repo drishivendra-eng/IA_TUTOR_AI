@@ -1,10 +1,12 @@
 import os
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+import requests
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError
@@ -43,6 +45,7 @@ async def no_cache_frontend_assets(request, call_next):
 
 SUPPORTED_IMAGE_TYPES = {'image/jpeg', 'image/jpg', 'image/png'}
 MAX_IMAGE_BYTES = 10 * 1024 * 1024
+RESOURCE_HOST = 'learninghub.telecom.com.fj'
 
 
 def validate_image_bytes(content_type: str, image_bytes: bytes) -> None:
@@ -111,6 +114,60 @@ async def resource_link(filename: str) -> dict[str, str]:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=502, detail='RESOURCE_SOURCE_UNAVAILABLE') from exc
+
+
+@app.get('/api/resource-file')
+async def resource_file(filename: str = Query(..., min_length=3, max_length=300), download: bool = False):
+    """View or download an exact public PDF through IA-Tutor without committing a copy to GitHub."""
+    try:
+        resource = resolve_resource(filename)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail='RESOURCE_SOURCE_UNAVAILABLE') from exc
+
+    source_url = resource['url']
+    if not source_url.startswith(f'https://{RESOURCE_HOST}/'):
+        raise HTTPException(status_code=400, detail='RESOURCE_SOURCE_NOT_ALLOWED')
+
+    try:
+        upstream = requests.get(
+            source_url,
+            timeout=30,
+            stream=True,
+            headers={'User-Agent': 'IA-Tutor-Resource-Viewer/1.0'},
+        )
+        upstream.raise_for_status()
+    except requests.RequestException as exc:
+        raise HTTPException(status_code=502, detail='RESOURCE_DOWNLOAD_ERROR') from exc
+
+    content_type = upstream.headers.get('content-type', 'application/pdf').split(';', 1)[0].strip().lower()
+    if content_type not in {'application/pdf', 'application/octet-stream'}:
+        upstream.close()
+        raise HTTPException(status_code=415, detail='RESOURCE_IS_NOT_A_PDF')
+
+    filename_only = Path(filename).name.replace('"', '')
+    disposition = f'attachment; filename="{filename_only}"' if download else f'inline; filename="{filename_only}"'
+
+    def stream():
+        try:
+            for chunk in upstream.iter_content(chunk_size=1024 * 256):
+                if chunk:
+                    yield chunk
+        finally:
+            upstream.close()
+
+    return StreamingResponse(
+        stream(),
+        media_type='application/pdf',
+        headers={
+            'Content-Disposition': disposition,
+            'Cache-Control': 'private, max-age=3600',
+            'X-IA-Tutor-Source': resource['source'],
+        },
+    )
 
 
 @app.post('/api/research')
