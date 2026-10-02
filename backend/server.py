@@ -14,11 +14,13 @@ try:
     from backend.schemas import DrawingProblemResponse
     from backend.normalization import normalize_response_payload
     from backend.research_service import research
+    from backend.resource_service import resolve_resource
 except ImportError:
     from vision_service import OpenAIProviderError, analyze_image_with_openai
     from schemas import DrawingProblemResponse
     from normalization import normalize_response_payload
     from research_service import research
+    from resource_service import resolve_resource
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / '.env')
@@ -99,6 +101,18 @@ async def health() -> dict[str, Any]:
     return {'status': 'ok'}
 
 
+@app.get('/api/resource-link')
+async def resource_link(filename: str) -> dict[str, str]:
+    try:
+        return resolve_resource(filename)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail='RESOURCE_SOURCE_UNAVAILABLE') from exc
+
+
 @app.post('/api/research')
 async def research_endpoint(request: ResearchRequest) -> dict[str, Any]:
     question = request.question.strip()
@@ -150,6 +164,10 @@ async def library() -> FileResponse:
 @app.get('/research.html')
 async def research_page() -> FileResponse:
     return FileResponse(PROJECT_ROOT / 'research.html')
+
+@app.get('/resource.html')
+async def resource_page() -> FileResponse:
+    return FileResponse(PROJECT_ROOT / 'resource.html')
 
 @app.get('/')
 async def index() -> FileResponse:
