@@ -1,6 +1,84 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>IA-Tutor | Resource Viewer</title><link rel="stylesheet" href="styles.css"><style>.page{max-width:1200px;margin:auto;padding:24px}.hero{padding:28px;border-radius:22px;background:linear-gradient(110deg,#0874dc,#4c22c8);color:#fff}.hero h1{color:#fff}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.btn{border:0;border-radius:10px;padding:12px 16px;background:#1167d8;color:#fff;font-weight:800;cursor:pointer}.card{background:#fff;border:1px solid #d9e5f3;border-radius:18px;padding:18px;margin-top:14px}.resource{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px;border:1px solid #dbe7f2;border-radius:14px;background:#f8fbff;margin-top:10px}.resource h3{margin:0;color:#0b2f62}.resource p{margin:6px 0;color:#64748b}.open{background:#4c2bd9}.viewer{display:none;margin-top:18px}.viewer iframe{width:100%;height:75vh;border:1px solid #cbd5e1;border-radius:14px;background:#fff}.notice{padding:12px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa;color:#9a4f00;line-height:1.5}@media(max-width:700px){.resource{align-items:flex-start;flex-direction:column}.page{padding:12px}.viewer iframe{height:65vh}}</style></head><body><main class="page"><a href="/library.html">← Back to Library</a><section class="hero"><p>🇫🇯 IA-Tutor • Resource Viewer</p><h1 id="title">Industrial Arts Resource</h1><p id="subtitle">Open the selected Year/subject resources directly from the IA-Tutor resource page.</p></section><div class="toolbar"><button class="btn" onclick="location.href='research.html'">🤖 Ask AI about this subject</button><button class="btn" onclick="location.href='/'">🏠 IA-Tutor Home</button></div><section class="card"><div class="notice">Resources are linked to their original public source. IA-Tutor does not copy entire copyrighted textbooks or examination papers into the app without permission.</div><div id="resources"></div></section><section class="card viewer" id="viewer"><h2 id="viewer-title">Document Viewer</h2><iframe id="pdf" title="Industrial Arts document"></iframe></section></main><script>const params=new URLSearchParams(location.search);const year=params.get('year')||'Years 9–13';const subject=params.get('subject')||'Industrial Arts';document.getElementById('title').textContent=`${year} • ${subject}`;document.getElementById('subtitle').textContent=`${year} ${subject} resources, worksheets and official/public source material.`;const source='https://learninghub.telecom.com.fj/worksheet';const ministry='https://www.education.gov.fj/';const data={
-'Year 13|Technical Drawing':[['21 Year 13 TD Worksheet 1.pdf','Year 13 Technical Drawing worksheet 1','Telecom Fiji Learning Hub'],['Year 13TD Worksheet 2 amended.pdf','Year 13 Technical Drawing worksheet 2','Telecom Fiji Learning Hub'],['Year 13TD Worksheet 4.pdf','Year 13 Technical Drawing worksheet 4','Telecom Fiji Learning Hub'],['Year 13TD Worksheet 5.pdf','Year 13 Technical Drawing worksheet 5','Telecom Fiji Learning Hub'],['Year 13TD Worksheet 6.pdf','Year 13 Technical Drawing worksheet 6','Telecom Fiji Learning Hub'],['Year 13TD Worksheet 7.pdf','Year 13 Technical Drawing worksheet 7','Telecom Fiji Learning Hub'],['Year 13TD Worksheet 8.pdf','Year 13 Technical Drawing worksheet 8','Telecom Fiji Learning Hub'],['Year 13TD Worksheet 10.pdf','Year 13 Technical Drawing worksheet 10','Telecom Fiji Learning Hub']],
-'Year 13|Applied Technology':[['21 Y13 Applied Technology Worksheet 1.pdf','Year 13 Applied Technology worksheet 1','Telecom Fiji Learning Hub'],['Y13 Applied Technology Worksheet # 2.pdf','Year 13 Applied Technology worksheet 2','Telecom Fiji Learning Hub'],['Y13 Applied Technology Worksheet # 4.pdf','Year 13 Applied Technology worksheet 4','Telecom Fiji Learning Hub'],['Y13 Applied Technology Worksheet # 5.pdf','Year 13 Applied Technology worksheet 5','Telecom Fiji Learning Hub'],['Y13 Applied Technology Worksheet 6.pdf','Year 13 Applied Technology worksheet 6','Telecom Fiji Learning Hub'],['Y13 Applied Technology Worksheet 7.pdf','Year 13 Applied Technology worksheet 7','Telecom Fiji Learning Hub'],['Y13 Applied Technology Worksheet 8.pdf','Year 13 Applied Technology worksheet 8','Telecom Fiji Learning Hub'],['Y13 Applied Technology Worksheet 10.pdf','Year 13 Applied Technology worksheet 10','Telecom Fiji Learning Hub']],
-'Year 11|Technical Drawing':[['21 Y11 TD Worksheet 1.pdf','Year 11 Technical Drawing worksheet 1','Telecom Fiji Learning Hub'],['Year 11TD Worksheet 2 amended.pdf','Year 11 Technical Drawing worksheet 2','Telecom Fiji Learning Hub'],['Year 11TD Worksheet 3 final.pdf','Year 11 Technical Drawing worksheet 3','Telecom Fiji Learning Hub'],['Year 11TD Worksheet 4.pdf','Year 11 Technical Drawing worksheet 4','Telecom Fiji Learning Hub'],['Year 11TD Worksheet 5.pdf','Year 11 Technical Drawing worksheet 5','Telecom Fiji Learning Hub'],['Year 11TD Worksheet 6.pdf','Year 11 Technical Drawing worksheet 6','Telecom Fiji Learning Hub'],['Year 11TD Worksheet 7.pdf','Year 11 Technical Drawing worksheet 7','Telecom Fiji Learning Hub'],['Year 11TD Worksheet 8.pdf','Year 11 Technical Drawing worksheet 8','Telecom Fiji Learning Hub'],['Year 11TD Worksheet 10.pdf','Year 11 Technical Drawing worksheet 10','Telecom Fiji Learning Hub']],
-'Year 12|Technical Drawing':[['21 Y12 TD Workshhet 1.pdf','Year 12 Technical Drawing worksheet 1','Telecom Fiji Learning Hub'],['Year 12TD Worksheet 2 amended.pdf','Year 12 Technical Drawing worksheet 2','Telecom Fiji Learning Hub'],['Year 12TD Worksheet 4.pdf','Year 12 Technical Drawing worksheet 4','Telecom Fiji Learning Hub'],['Year 12TD Worksheet 5.pdf','Year 12 Technical Drawing worksheet 5','Telecom Fiji Learning Hub'],['Year 12TD Worksheet 6.pdf','Year 12 Technical Drawing worksheet 6','Telecom Fiji Learning Hub'],['Year 12TD Worksheet 7.pdf','Year 12 Technical Drawing worksheet 7','Telecom Fiji Learning Hub'],['Year 12TD Worksheet 8.pdf','Year 12 Technical Drawing worksheet 8','Telecom Fiji Learning Hub'],['Year 12TD Worksheet 10.pdf','Year 12 Technical Drawing worksheet 10','Telecom Fiji Learning Hub']]};
-const key=`${year}|${subject}`;const items=data[key]||[];const box=document.getElementById('resources');if(items.length){box.innerHTML=items.map((r,i)=>`<article class="resource"><div><h3>📄 ${r[1]}</h3><p>${r[0]} • ${r[2]}</p></div><button class="btn open" onclick="openSource()">Open source file →</button></article>`).join('')}else{box.innerHTML=`<div class="resource"><div><h3>📚 Official source directory</h3><p>No file has been mapped to this subject yet. Open the original source directory and use the IA-Tutor AI search for this year/subject.</p></div><button class="btn open" onclick="openSource()">Open source directory →</button></div>`}function openSource(){document.getElementById('viewer').style.display='block';document.getElementById('viewer-title').textContent=`${year} • ${subject} — Original Source`;document.getElementById('pdf').src=source;document.getElementById('viewer').scrollIntoView({behavior:'smooth'});}</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IA-Tutor | Resource Viewer</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+.page{max-width:1200px;margin:auto;padding:24px}.hero{padding:28px;border-radius:22px;background:linear-gradient(110deg,#0874dc,#4c22c8);color:#fff}.hero h1{color:#fff}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.btn{border:0;border-radius:10px;padding:12px 16px;background:#1167d8;color:#fff;font-weight:800;cursor:pointer;text-decoration:none;display:inline-block}.card{background:#fff;border:1px solid #d9e5f3;border-radius:18px;padding:18px;margin-top:14px}.resource{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px;border:1px solid #dbe7f2;border-radius:14px;background:#f8fbff;margin-top:10px}.resource h3{margin:0;color:#0b2f62}.resource p{margin:6px 0;color:#64748b}.open{background:#4c2bd9}.viewer{display:none;margin-top:18px}.viewer iframe{width:100%;height:75vh;border:1px solid #cbd5e1;border-radius:14px;background:#fff}.notice{padding:12px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa;color:#9a4f00;line-height:1.5}.status{color:#475569;min-height:24px}.error{background:#fff1f2;border:1px solid #fecdd3;color:#9f1239}.success{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}@media(max-width:700px){.resource{align-items:flex-start;flex-direction:column}.page{padding:12px}.viewer iframe{height:65vh}}
+</style>
+</head>
+<body>
+<main class="page">
+<a href="/library.html">← Back to Library</a>
+<section class="hero"><p>🇫🇯 IA-Tutor • Resource Viewer</p><h1 id="title">Industrial Arts Resource</h1><p id="subtitle">Select a real worksheet or learning file and open that exact document.</p></section>
+<div class="toolbar"><a class="btn" id="ask-ai" href="research.html">🤖 Ask AI about this subject</a><a class="btn" href="/">🏠 IA-Tutor Home</a></div>
+<section class="card"><div class="notice">IA-Tutor resolves each filename against the original public Fiji learning-resource page. It does not invent PDF URLs or copy the documents into the application.</div><p id="status" class="status"></p><div id="resources"></div></section>
+<section class="card viewer" id="viewer"><h2 id="viewer-title">Document Viewer</h2><p id="viewer-status" class="status"></p><iframe id="pdf" title="Industrial Arts document"></iframe><div class="toolbar"><a id="open-original" class="btn" href="#" target="_blank" rel="noopener">↗ Open original file</a></div></section>
+</main>
+<script>
+const params=new URLSearchParams(location.search);
+const year=params.get('year')||'Years 9–13';
+const subject=params.get('subject')||'Industrial Arts';
+const title=document.getElementById('title');
+const subtitle=document.getElementById('subtitle');
+const status=document.getElementById('status');
+const viewer=document.getElementById('viewer');
+const pdf=document.getElementById('pdf');
+const viewerTitle=document.getElementById('viewer-title');
+const viewerStatus=document.getElementById('viewer-status');
+const original=document.getElementById('open-original');
+title.textContent=`${year} • ${subject}`;
+subtitle.textContent=`${year} ${subject} resources, worksheets and official/public source material.`;
+document.getElementById('ask-ai').href=`research.html?year=${encodeURIComponent(year)}&subject=${encodeURIComponent(subject)}`;
+
+const data={
+'Year 13|Technical Drawing':[
+['21 Year 13 TD Worksheet 1.pdf','Year 13 Technical Drawing — Worksheet 1'],['Year 13TD Worksheet 2 amended.pdf','Year 13 Technical Drawing — Worksheet 2'],['Year 13TD Worksheet 4.pdf','Year 13 Technical Drawing — Worksheet 4'],['Year 13TD Worksheet 5.pdf','Year 13 Technical Drawing — Worksheet 5'],['Year 13TD Worksheet 6.pdf','Year 13 Technical Drawing — Worksheet 6'],['Year 13TD Worksheet 7.pdf','Year 13 Technical Drawing — Worksheet 7'],['Year 13TD Worksheet 8.pdf','Year 13 Technical Drawing — Worksheet 8'],['Year 13TD Worksheet 10.pdf','Year 13 Technical Drawing — Worksheet 10']],
+'Year 13|Applied Technology':[
+['21 Y13 Applied Technology Worksheet 1.pdf','Year 13 Applied Technology — Worksheet 1'],['Y13 Applied Technology Worksheet # 2.pdf','Year 13 Applied Technology — Worksheet 2'],['Y13 Applied Technology Worksheet # 4.pdf','Year 13 Applied Technology — Worksheet 4'],['Y13 Applied Technology Worksheet # 5.pdf','Year 13 Applied Technology — Worksheet 5'],['Y13 Applied Technology Worksheet 6.pdf','Year 13 Applied Technology — Worksheet 6'],['Y13 Applied Technology Worksheet 7.pdf','Year 13 Applied Technology — Worksheet 7'],['Y13 Applied Technology Worksheet 8.pdf','Year 13 Applied Technology — Worksheet 8'],['Y13 Applied Technology Worksheet 10.pdf','Year 13 Applied Technology — Worksheet 10']],
+'Year 11|Technical Drawing':[
+['21 Y11 TD Worksheet 1.pdf','Year 11 Technical Drawing — Worksheet 1'],['Year 11TD Worksheet 2 amended.pdf','Year 11 Technical Drawing — Worksheet 2'],['Year 11TD Worksheet 3 final.pdf','Year 11 Technical Drawing — Worksheet 3'],['Year 11TD Worksheet 4.pdf','Year 11 Technical Drawing — Worksheet 4'],['Year 11TD Worksheet 5.pdf','Year 11 Technical Drawing — Worksheet 5'],['Year 11TD Worksheet 6.pdf','Year 11 Technical Drawing — Worksheet 6'],['Year 11TD Worksheet 7.pdf','Year 11 Technical Drawing — Worksheet 7'],['Year 11TD Worksheet 8.pdf','Year 11 Technical Drawing — Worksheet 8'],['Year 11TD Worksheet 10.pdf','Year 11 Technical Drawing — Worksheet 10']],
+'Year 12|Technical Drawing':[
+['21 Y12 TD Workshhet 1.pdf','Year 12 Technical Drawing — Worksheet 1'],['Year 12TD Worksheet 2 amended.pdf','Year 12 Technical Drawing — Worksheet 2'],['Year 12TD Worksheet 4.pdf','Year 12 Technical Drawing — Worksheet 4'],['Year 12TD Worksheet 5.pdf','Year 12 Technical Drawing — Worksheet 5'],['Year 12TD Worksheet 6.pdf','Year 12 Technical Drawing — Worksheet 6'],['Year 12TD Worksheet 7.pdf','Year 12 Technical Drawing — Worksheet 7'],['Year 12TD Worksheet 8.pdf','Year 12 Technical Drawing — Worksheet 8'],['Year 12TD Worksheet 10.pdf','Year 12 Technical Drawing — Worksheet 10']],
+'Year 11|Applied Technology':[
+['Y11 Applied Technology Worksheet # 2.pdf','Year 11 Applied Technology — Worksheet 2'],['Y11 Applied Technology Worksheet # 4.pdf','Year 11 Applied Technology — Worksheet 4'],['Y11 Applied Technology Worksheet 6.pdf','Year 11 Applied Technology — Worksheet 6'],['Y11 Applied Technology Worksheet 7.pdf','Year 11 Applied Technology — Worksheet 7'],['Y11 Applied Technology Worksheet 8.pdf','Year 11 Applied Technology — Worksheet 8'],['Y11 Applied Technology Worksheet 10.pdf','Year 11 Applied Technology — Worksheet 10']],
+'Year 12|Applied Technology':[
+['Y12 Applied Technology Worksheet # 2.pdf','Year 12 Applied Technology — Worksheet 2'],['Y12 Applied Technology Worksheet # 4.pdf','Year 12 Applied Technology — Worksheet 4'],['Y12 Applied Technology Worksheet # 5.pdf','Year 12 Applied Technology — Worksheet 5'],['Y12 Applied Technology Worksheet 6.pdf','Year 12 Applied Technology — Worksheet 6'],['Y12 Applied Technology Worksheet 7.pdf','Year 12 Applied Technology — Worksheet 7'],['Y12 Applied Technology Worksheet 8.pdf','Year 12 Applied Technology — Worksheet 8'],['Y12 Applied Technology Worksheet 10.pdf','Year 12 Applied Technology — Worksheet 10']],
+'Year 10|Basic Technology':[
+['21 Y 10 BT _ BGT Worksheet 1.pdf','Year 10 Basic Technology & Basic Graphics Technology — Worksheet 1'],['Year 10 BT _ BGT Worksheet 2 amended.pdf','Year 10 Basic Technology & Basic Graphics Technology — Worksheet 2'],['Year 10 BT _ BGT Worksheet 3.pdf','Year 10 Basic Technology & Basic Graphics Technology — Worksheet 3'],['Year 10 BT _ BGT Worksheet 4.pdf','Year 10 Basic Technology & Basic Graphics Technology — Worksheet 4'],['Year 10 BT & BGT Worksheet 5.pdf','Year 10 Basic Technology & Basic Graphics Technology — Worksheet 5'],['Year 10 BT _ BGT Worksheet 6.pdf','Year 10 Basic Technology & Basic Graphics Technology — Worksheet 6'],['Year 10 BT _ BGT Worksheet 7.pdf','Year 10 Basic Technology & Basic Graphics Technology — Worksheet 7'],['Year 10 BT _ BGT Worksheet 8.pdf','Year 10 Basic Technology & Basic Graphics Technology — Worksheet 8'],['Year 10 BT & BGT Worksheet 10.pdf','Year 10 Basic Technology & Basic Graphics Technology — Worksheet 10']]
+};
+
+const items=data[`${year}|${subject}`]||[];
+const box=document.getElementById('resources');
+if(!items.length){
+ box.innerHTML=`<div class="resource"><div><h3>📚 Resource mapping in progress</h3><p>This subject is available in the Library, but its individual public files have not yet been mapped.</p></div></div>`;
+ status.textContent='Choose a mapped resource subject to open individual files directly.';
+}else{
+ status.textContent=`${items.length} resources available. Click a worksheet to open the exact file.`;
+ box.innerHTML=items.map((r,i)=>`<article class="resource"><div><h3>📄 ${r[1]}</h3><p>${r[0]}</p></div><button class="btn open" type="button" onclick="openResource(${JSON.stringify(r[0])})">Open file →</button></article>`).join('');
+}
+
+async function openResource(filename){
+ viewer.style.display='block';
+ viewerTitle.textContent=filename;
+ viewerStatus.textContent='🔎 Finding the exact public file…';
+ viewerStatus.className='status';
+ pdf.removeAttribute('src');
+ original.href='#';
+ try{
+   const response=await fetch(`/api/resource-link?filename=${encodeURIComponent(filename)}`);
+   const result=await response.json();
+   if(!response.ok) throw new Error(result.detail||'The exact file could not be found.');
+   original.href=result.url;
+   pdf.src=result.url;
+   viewerStatus.textContent='✅ Exact source file found. It is displayed below when the source permits embedded viewing.';
+   viewerStatus.className='status success';
+ }catch(error){
+   viewerStatus.textContent='❌ '+error.message;
+   viewerStatus.className='status error';
+ }
+ viewer.scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body></html>
