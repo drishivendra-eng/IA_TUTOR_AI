@@ -13,6 +13,21 @@ class ConfidenceResponse(BaseModel):
     explanation: str
 
 
+class CadPrimitive(BaseModel):
+    type: str
+    x1: float | None = None
+    y1: float | None = None
+    x2: float | None = None
+    y2: float | None = None
+    cx: float | None = None
+    cy: float | None = None
+    r: float | None = None
+    points: list[list[float]] | None = None
+    label: str | None = None
+    layer: str = 'Object'
+    construction: bool = False
+
+
 class DrawingProblem(BaseModel):
     drawing_type: str
     projection_type: str
@@ -28,6 +43,7 @@ class DrawingProblem(BaseModel):
     circles: list[str] | None = None
     arcs: list[str] | None = None
     construction_requirements: list[str] | None = None
+    cad_geometry: list[CadPrimitive] = Field(default_factory=list)
     difficulty: str | int | float | None = None
     confidence: ConfidenceResponse
     explanation: str
@@ -37,37 +53,22 @@ class DrawingProblem(BaseModel):
     def normalize_unknown_dimensions(cls, values):
         if not isinstance(values, dict):
             return values
-
         normalized = dict(values)
         construction_requirements = normalized.get('construction_requirements')
         if isinstance(construction_requirements, str):
             normalized['construction_requirements'] = [construction_requirements]
-
         overall_dimensions = normalized.get('overall_dimensions') or {}
-        normalized['overall_dimensions'] = {
-            name: overall_dimensions.get(name)
-            for name in ('width', 'height', 'depth')
-        }
-
+        normalized['overall_dimensions'] = {name: overall_dimensions.get(name) for name in ('width', 'height', 'depth')}
         dimensions = normalized.get('dimensions') or {}
-        normalized['dimensions'] = {
-            name: cls.normalize_dimension_value(dimensions.get(name))
-            for name in ('width', 'height', 'depth')
-        }
+        normalized['dimensions'] = {name: cls.normalize_dimension_value(dimensions.get(name)) for name in ('width', 'height', 'depth')}
+        normalized['cad_geometry'] = normalized.get('cad_geometry') or []
         return normalized
 
     @staticmethod
     def normalize_dimension_value(value):
         if isinstance(value, dict):
             return DrawingProblem.normalize_dimension_value(value.get('value'))
-        if isinstance(value, str) and value.strip().lower() in {
-            'unknown',
-            'not visible',
-            'not detected',
-            'not provided',
-            'n/a',
-            'na',
-        }:
+        if isinstance(value, str) and value.strip().lower() in {'unknown', 'not visible', 'not detected', 'not provided', 'n/a', 'na'}:
             return None
         return value
 
