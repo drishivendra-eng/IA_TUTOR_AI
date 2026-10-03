@@ -30,7 +30,7 @@ load_dotenv(PROJECT_ROOT / '.env')
 app = FastAPI(title='IA-Tutor AI Backend')
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r'^https://.*-8000\.app\.github\.dev$|^http://(localhost|127\.0\.0\.1)(:\d+)?$',
+    allow_origin_regex=r'^https://.*-8000\\.app\\.github\\.dev$|^http://(localhost|127\\.0\\.0\\.1)(:\\d+)?$',
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
@@ -133,12 +133,7 @@ async def resource_file(filename: str = Query(..., min_length=3, max_length=300)
         raise HTTPException(status_code=400, detail='RESOURCE_SOURCE_NOT_ALLOWED')
 
     try:
-        upstream = requests.get(
-            source_url,
-            timeout=30,
-            stream=True,
-            headers={'User-Agent': 'IA-Tutor-Resource-Viewer/1.0'},
-        )
+        upstream = requests.get(source_url, timeout=30, stream=True, headers={'User-Agent': 'IA-Tutor-Resource-Viewer/1.0'})
         upstream.raise_for_status()
     except requests.RequestException as exc:
         raise HTTPException(status_code=502, detail='RESOURCE_DOWNLOAD_ERROR') from exc
@@ -159,15 +154,7 @@ async def resource_file(filename: str = Query(..., min_length=3, max_length=300)
         finally:
             upstream.close()
 
-    return StreamingResponse(
-        stream(),
-        media_type='application/pdf',
-        headers={
-            'Content-Disposition': disposition,
-            'Cache-Control': 'private, max-age=3600',
-            'X-IA-Tutor-Source': resource['source'],
-        },
-    )
+    return StreamingResponse(stream(), media_type='application/pdf', headers={'Content-Disposition': disposition, 'Cache-Control': 'private, max-age=3600', 'X-IA-Tutor-Source': resource['source']})
 
 
 @app.post('/api/research')
@@ -192,10 +179,7 @@ async def analyze_drawing(image: UploadFile = File(...)) -> DrawingProblemRespon
     validate_image_bytes(content_type, image_bytes)
     api_key = os.getenv('OPENAI_API_KEY')
     if not api_key:
-        try:
-            return build_demo_response()
-        except ValidationError as exc:
-            raise HTTPException(status_code=500, detail=f'Demo response validation failed: {exc}') from exc
+        return build_demo_response()
     try:
         result = analyze_image_with_openai(image_bytes, image.filename or 'drawing.png', content_type, api_key)
         return DrawingProblemResponse.model_validate(normalize_response_payload(result))
@@ -217,6 +201,10 @@ async def styles() -> FileResponse:
 @app.get('/library.html')
 async def library() -> FileResponse:
     return FileResponse(PROJECT_ROOT / 'library.html')
+
+@app.get('/industrial-arts-library.html')
+async def industrial_arts_library() -> FileResponse:
+    return FileResponse(PROJECT_ROOT / 'industrial-arts-library.html')
 
 @app.get('/research.html')
 async def research_page() -> FileResponse:
