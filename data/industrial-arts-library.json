@@ -1,0 +1,79 @@
+{
+  "title": "Fiji Industrial Arts Library",
+  "description": "IA-Tutor Years 9–13 Industrial Arts resource map.",
+  "subjects": [
+    {
+      "year": "Year 9",
+      "subject": "Basic Technology",
+      "areas": ["Tools and equipment", "Materials", "Workshop practice", "Safety and OHS", "Basic practical technology"],
+      "resources": []
+    },
+    {
+      "year": "Year 9",
+      "subject": "Basic Graphics Technology",
+      "areas": ["Graphics", "Drawing", "Design", "Practical activities"],
+      "resources": []
+    },
+    {
+      "year": "Year 10",
+      "subject": "Basic Technology",
+      "areas": ["Tools and equipment", "Materials", "Processes", "Workshop practice", "Safety and OHS"],
+      "resources": []
+    },
+    {
+      "year": "Year 10",
+      "subject": "Basic Graphics Technology",
+      "areas": ["Graphics", "Drawing", "Design", "Practical activities"],
+      "resources": []
+    },
+    {
+      "year": "Year 11",
+      "subject": "Technical Drawing",
+      "areas": ["Technical drawing", "Dimensioning", "Geometric construction", "CAD foundations"],
+      "resources": []
+    },
+    {
+      "year": "Year 11",
+      "subject": "Applied Technology",
+      "areas": ["Materials", "Processes", "Tools", "Applied projects"],
+      "resources": []
+    },
+    {
+      "year": "Year 12",
+      "subject": "Technical Drawing",
+      "areas": ["Advanced technical drawing", "Dimensioning", "CAD practice", "Design"],
+      "resources": []
+    },
+    {
+      "year": "Year 12",
+      "subject": "Applied Technology",
+      "areas": ["Advanced materials", "Processes", "Project work"],
+      "resources": []
+    },
+    {
+      "year": "Year 13",
+      "subject": "Technical Drawing",
+      "areas": ["Advanced technical drawing", "CAD", "Design", "Examination practice"],
+      "resources": [
+        {"title": "Year 13 TD Worksheet 1", "type": "worksheet", "source": "Fiji Learning Hub", "verified": true},
+        {"title": "Year 13 TD Worksheet 2", "type": "worksheet", "source": "Fiji Learning Hub", "verified": true},
+        {"title": "Year 13 TD Worksheet 4", "type": "worksheet", "source": "Fiji Learning Hub", "verified": true},
+        {"title": "Year 13 TD Worksheet 5", "type": "worksheet", "source": "Fiji Learning Hub", "verified": true},
+        {"title": "Year 13 TD Worksheet 6", "type": "worksheet", "source": "Fiji Learning Hub", "verified": true},
+        {"title": "Year 13 TD Worksheet 7", "type": "worksheet", "source": "Fiji Learning Hub", "verified": true},
+        {"title": "Year 13 TD Worksheet 8", "type": "worksheet", "source": "Fiji Learning Hub", "verified": true},
+        {"title": "Year 13 TD Worksheet 10", "type": "worksheet", "source": "Fiji Learning Hub", "verified": true}
+      ]
+    },
+    {
+      "year": "Year 13",
+      "subject": "Applied Technology",
+      "areas": ["Materials", "Processes", "Applied projects", "Examination practice"],
+      "resources": []
+    }
+  ],
+  "official_context": {
+    "source": "Fiji Ministry of Education annual reports",
+    "notes": "Ministry reports document Industrial Arts curriculum review, textbook/workbook development, and examination activity for Basic Technology, Basic Graphics Technology, Technical Drawing and Applied Technology."
+  }
+}
