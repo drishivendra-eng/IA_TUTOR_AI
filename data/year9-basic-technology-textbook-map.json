@@ -1,0 +1,48 @@
+{
+  "title": "Year 9 Basic Technology Textbook Knowledge Map",
+  "source": "YEAR 9 Basic Technology Txt Bk Amended (1) - eidted.pdf",
+  "publisher": "Ministry of Education, Fiji",
+  "edition_date": "26 June 2018",
+  "copyright_note": "Use as an authorised/reference source. Do not reproduce the full textbook in the application unless permission/licensing permits it.",
+  "purpose": "Map the Year 9 textbook into IA-Tutor so the AI can retrieve relevant topics, explain concepts, guide worksheet work, and analyse uploaded student drawings/questions.",
+  "chapters": [
+    {
+      "name": "Safety",
+      "page": 6,
+      "topics": ["General Workshop Safety", "Personal Safety", "Hand Tools Safety", "Electrical and Machine Safety", "First Aid/OHS Regulations"]
+    },
+    {
+      "name": "Plane Geometry",
+      "page": 12,
+      "topics": ["Basic Technical Drawing Equipment", "Preparing A4 Sheet and Paper Layout", "Using Tee and Set Squares", "Types of Lines and Their Uses", "Lettering and Numbering", "Symbols and Conventions", "Sketching", "Division of Lines, Angles, Arcs and Circles", "Triangles", "Quadrilaterals", "Polygons", "Ellipse"]
+    },
+    {
+      "name": "Design and Enterprising",
+      "page": 36,
+      "topics": ["Design Cycle", "Design Elements", "Colours", "Principles of Design", "Design for Recycling", "Green Design", "Enterprising Skills"]
+    },
+    {
+      "name": "Hand Tools and Materials",
+      "page": 57,
+      "topics": ["Classification of Tools", "Metals", "Timber", "Leather", "Hardware", "Finishes", "Sharpening Tools", "Abrasives"]
+    },
+    {
+      "name": "Geometrical Drawing",
+      "page": 91,
+      "topics": ["Orthographic Projection", "Isometric Views and Drawings", "Oblique Views and Drawings", "Perspective Views and Drawings", "Solid Geometry", "Orthographic Projection of Geometrical Solids", "Surface Development of Geometrical Solids"]
+    },
+    {
+      "name": "Joints and Processes",
+      "page": 116,
+      "topics": ["Wood Joints", "Metal Joints"]
+    }
+  ],
+  "ai_behaviour": {
+    "student_text_question": "Identify the relevant Year 9 topic, retrieve the relevant source context, explain in simple language, then provide a worked solution or guided steps.",
+    "student_photo": "Inspect the uploaded worksheet/drawing, extract visible text and dimensions, identify the topic, compare against the textbook method, and produce a step-by-step answer. Never invent unreadable dimensions; ask for a clearer image when required.",
+    "technical_drawing": "Where the question is a drawing construction, identify required instruments, construction sequence, dimensions, projection/view type and expected final result. Generate CAD geometry only when the dimensions and construction are sufficiently clear.",
+    "worksheet_mode": "Guide the student through the worksheet using the textbook as the learning source. Provide answers with explanations rather than unexplained final answers.",
+    "source_display": "Show the relevant textbook chapter/topic and page reference to the student without reproducing the entire copyrighted textbook.",
+    "uncertainty": "If the AI cannot confidently identify the question or drawing, explain what is uncertain and provide an option to escalate to human support."
+  }
+}
