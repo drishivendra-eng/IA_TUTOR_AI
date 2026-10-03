@@ -4,7 +4,7 @@ from typing import Any
 from urllib.parse import quote
 
 import requests
-from fastapi import FastAPI, File, HTTPException, Query, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -17,12 +17,14 @@ try:
     from backend.normalization import normalize_response_payload
     from backend.research_service import research
     from backend.resource_service import resolve_resource
+    from backend.chat_service import TutorProviderError, ask_tutor
 except ImportError:
     from vision_service import OpenAIProviderError, analyze_image_with_openai
     from schemas import DrawingProblemResponse
     from normalization import normalize_response_payload
     from research_service import research
     from resource_service import resolve_resource
+    from chat_service import TutorProviderError, ask_tutor
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / '.env')
@@ -30,7 +32,7 @@ load_dotenv(PROJECT_ROOT / '.env')
 app = FastAPI(title='IA-Tutor AI Backend')
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r'^https://.*-8000\.app\.github\.dev$|^http://(localhost|127\.0\.0\.1)(:\d+)?$',
+    allow_origin_regex=r'^https://.*-8000\\.app\\.github\\.dev$|^http://(localhost|127\\.0\\.0\\.1)(:\\d+)?$',
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
@@ -45,6 +47,7 @@ async def no_cache_frontend_assets(request, call_next):
 
 SUPPORTED_IMAGE_TYPES = {'image/jpeg', 'image/jpg', 'image/png'}
 MAX_IMAGE_BYTES = 10 * 1024 * 1024
+MAX_TUTOR_FILE_BYTES = 20 * 1024 * 1024
 RESOURCE_HOST = 'learninghub.telecom.com.fj'
 
 
@@ -77,6 +80,16 @@ def classify_provider_error(error: OpenAIProviderError) -> tuple[int, str]:
     return 502, 'PROVIDER_ERROR'
 
 
+def classify_tutor_error(error: TutorProviderError) -> tuple[int, str]:
+    if error.status_code in (401, 403):
+        return 502, 'AUTHENTICATION_ERROR'
+    if error.status_code == 429:
+        return 429, 'RATE_LIMIT_OR_BILLING_ERROR'
+    if 400 <= error.status_code < 500:
+        return 400, 'INVALID_TUTOR_REQUEST'
+    return 502, 'AI_TUTOR_PROVIDER_ERROR'
+
+
 def build_demo_response() -> DrawingProblemResponse:
     return DrawingProblemResponse.model_validate(normalize_response_payload({
         'mode': 'demo', 'message': 'Vision AI is not configured. Using Demo Analysis.',
@@ -99,9 +112,73 @@ class ResearchRequest(BaseModel):
     subject: str = 'Industrial Arts'
 
 
+class TutorChatRequest(BaseModel):
+    message: str
+    year: str = '9'
+    subject: str = 'Basic Technology'
+    sourcePriority: str | None = None
+
+
 @app.get('/api/health')
 async def health() -> dict[str, Any]:
-    return {'status': 'ok'}
+    return {'status': 'ok', 'chat': 'available', 'vision': 'available'}
+
+
+@app.post('/api/chat')
+async def tutor_chat(request: TutorChatRequest) -> dict[str, Any]:
+    message = request.message.strip()
+    if len(message) < 2:
+        raise HTTPException(status_code=400, detail='Please enter a question.')
+    if len(message) > 5000:
+        raise HTTPException(status_code=400, detail='Question is too long.')
+    try:
+        return ask_tutor(message, request.year, request.subject)
+    except TutorProviderError as exc:
+        status_code, category = classify_tutor_error(exc)
+        raise HTTPException(status_code=status_code, detail=category) from exc
+
+
+@app.post('/api/ai-tutor')
+async def tutor_file(
+    file: UploadFile = File(...),
+    year: str = Form('9'),
+    subject: str = Form('Basic Technology'),
+    question: str = Form('Analyse this student submission and give a step-by-step solution.'),
+    sourcePriority: str = Form('Year textbook and workbook first'),
+) -> dict[str, Any]:
+    """Document entry point used by the Solution Workspace.
+
+    Images should use /api/analyze-drawing. This endpoint currently accepts a document/CAD
+    file and provides a clear response until a document parser is configured; it never
+    pretends that an unreadable DOC/PDF/DWG/DXF was analysed.
+    """
+    content = await file.read(MAX_TUTOR_FILE_BYTES + 1)
+    if not content:
+        raise HTTPException(status_code=400, detail='The uploaded file is empty.')
+    if len(content) > MAX_TUTOR_FILE_BYTES:
+        raise HTTPException(status_code=413, detail='The uploaded file exceeds the 20 MiB limit.')
+
+    filename = (file.filename or 'submission').lower()
+    supported = filename.endswith(('.pdf', '.doc', '.docx', '.dwg', '.dxf', '.txt'))
+    if not supported:
+        raise HTTPException(status_code=400, detail='Unsupported document type. Use PDF, DOC, DOCX, DWG or DXF.')
+
+    prompt = (
+        f'Year {year} {subject}. {question}\n'
+        f'Source priority: {sourcePriority}.\n'
+        f'The uploaded file is {file.filename}. A document/CAD parser is not configured for this file in this deployment. '
+        'Do not claim to have read the file contents. Tell the student to upload a clear image of the worksheet/drawing '
+        'or paste the question if exact solving is required.'
+    )
+    try:
+        answer = ask_tutor(prompt, year, subject)
+        answer['file_name'] = file.filename
+        answer['file_type'] = filename.rsplit('.', 1)[-1].upper() if '.' in filename else 'FILE'
+        answer['document_parsed'] = False
+        return answer
+    except TutorProviderError as exc:
+        status_code, category = classify_tutor_error(exc)
+        raise HTTPException(status_code=status_code, detail=category) from exc
 
 
 @app.get('/api/resource-link')
