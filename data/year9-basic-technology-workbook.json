@@ -1,0 +1,46 @@
+{
+  "title": "Basic Technology Year 9 Student Workbook",
+  "source": "Ministry of Education, Fiji — Technical Employment Skills and Training, 2019",
+  "filename": "BT Yr 9 Workbook.pdf",
+  "ai_role": "Use this workbook as the primary Year 9 Basic Technology source when answering worksheet and drawing questions. Explain answers step-by-step and distinguish source-derived information from AI-generated guidance.",
+  "workflow": [
+    "Identify the student's Year 9 topic or worksheet question.",
+    "Match the question to the relevant workbook lesson or sheet.",
+    "Explain the required technical-drawing method in simple steps.",
+    "If a student uploads a photograph, inspect the drawing, identify visible dimensions, instruments, line types, symbols and construction geometry, then solve the question.",
+    "Show the reasoning and final answer; do not invent dimensions that are not visible or stated.",
+    "If the image is unclear, ask the student to retake the photograph rather than guessing.",
+    "Where a drawing can be reconstructed, generate the corresponding CAD/technical-drawing construction.",
+    "Offer the matching workbook sheet as the learning source and save completed work to the e-Portfolio."
+  ],
+  "observed_workbook_topics": [
+    "Basic drawing instruments",
+    "T-square use",
+    "Set squares",
+    "Protractor",
+    "Compass",
+    "Divider",
+    "Pencil selection and technical drawing practice",
+    "Using set squares for vertical and angled lines",
+    "Geometric shapes and centre-line construction",
+    "Lettering",
+    "Paper layout and title block",
+    "Symbols and conventions",
+    "Dimensioning practices",
+    "Linear dimensions",
+    "Angular dimensions",
+    "Radial/diameter dimensions",
+    "Shape dimensioning",
+    "Technical drawing line conventions"
+  ],
+  "source_pages_checked": [1,2,3,4,5,6,7,8],
+  "notes": [
+    "Page 1 identifies the document as the Year 9 Basic Technology Student Workbook.",
+    "Page 2 states it was prepared for the Year 9 Basic Technology students section of the Technical Employment Skills and Training section of the Ministry of Education.",
+    "Page 3 covers basic drawing instruments including T-square, set squares, protractor, compass, divider and pencil.",
+    "Page 4 provides exercises using set squares to produce vertical and angled lines.",
+    "Pages 5–6 include centre-line and shape construction exercises.",
+    "Page 7 covers lettering, paper layout/title block and symbols/conventions.",
+    "Page 8 covers dimensioning practices and dimensioning of shapes."
+  ]
+}
