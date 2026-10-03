@@ -30,7 +30,7 @@ load_dotenv(PROJECT_ROOT / '.env')
 app = FastAPI(title='IA-Tutor AI Backend')
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r'^https://.*-8000\\.app\\.github\\.dev$|^http://(localhost|127\\.0\\.0\\.1)(:\\d+)?$',
+    allow_origin_regex=r'^https://.*-8000\.app\.github\.dev$|^http://(localhost|127\.0\.0\.1)(:\d+)?$',
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
