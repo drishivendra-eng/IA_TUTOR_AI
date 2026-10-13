@@ -84,31 +84,66 @@ async function handleAnalyseQuestion() {
     const analysis = await visionAIService.analyze(selectedImage); currentAnalysisProblem = analysis.problem; populateAnalysisPanel(analysis.problem);
     const hasDimensions = ['width', 'height', 'depth'].every((key) => Number.isFinite(Number(analysis.problem?.dimensions?.[key])));
     if (hasDimensions) setFormValues(buildGeometryProblem(analysis.problem)); else setFormValues({});
-    analysisModeBanner.textContent = analysis.mode === 'demo' ? 'DEMO ANALYSIS' : 'REAL AI ANALYSIS + CAD'; demoAnalysisBanner.textContent = analysis.message || 'Review the extracted drawing and CAD solution.';
-    confirmAnalysisButton.disabled = false; generateDrawingButton.disabled = false; analysisConfirmed = true;
-    renderRealCad(analysis.problem);
-    updateStatus(Array.isArray(analysis.problem?.cad_geometry) && analysis.problem.cad_geometry.length ? 'AI reconstructed the drawing and loaded it into the open CAD workspace.' : hasDimensions ? 'AI found dimensions and loaded a CAD construction.' : 'AI analysed the question; review the CAD workspace.', 'success');
+    analysisModeBanner.textContent = analysis.mode === 'demo' ? 'DEMO ANALYSIS' : 'REAL AI ANALYSIS — CONFIRM REQUIRED'; demoAnalysisBanner.textContent = analysis.message || 'Review the extracted drawing and construction requirements before generating the CAD solution.';
+    confirmAnalysisButton.disabled = false; generateDrawingButton.disabled = true; analysisConfirmed = false;
+    renderRealCad({});
+    updateStatus('Analysis ready. Review the detected requirements, then click Confirm Analysis and Generate Drawing.', 'success');
   } catch (error) { demoAnalysisBanner.textContent = 'Real Vision AI analysis failed. No demo result was used.'; updateStatus(error.connectionFailure ? `NETWORK ERROR: ${error.message}` : `API ERROR: ${error.message || 'Vision AI analysis failed.'}`, 'error'); }
 }
-function handleConfirmAnalysis() { if (!currentAnalysisProblem) { updateStatus('Analyse a question first.', 'error'); return; } analysisConfirmed = true; generateDrawingButton.disabled = false; updateStatus('Analysis confirmed. The AutoCAD-style solution is ready.', 'success'); }
+function handleConfirmAnalysis() { if (!currentAnalysisProblem) { updateStatus('Analyse a question first.', 'error'); return; } analysisConfirmed = true; generateDrawingButton.disabled = false; updateStatus('Analysis confirmed. Click Generate Drawing to place the solution in the CAD workspace.', 'success'); }
 function handleGenerateDrawing() { try { if (!currentAnalysisProblem || !analysisConfirmed) throw new Error('Analyse and confirm the question first.'); renderSolution(currentAnalysisProblem); updateStatus('Automatic CAD-method drawing generated.', 'success'); } catch (error) { updateStatus(error.message, 'error'); } }
 function extractQuestionDimensions(text) {
   const source = String(text || '').replace(/[,;]/g, ' '); const number = '(\\d+(?:\\.\\d+)?)';
   const find = (patterns) => { for (const pattern of patterns) { const match = source.match(pattern); if (match) return Number(match[1]); } return null; };
   return { width: find([new RegExp(`(?:width|wide)\\s*(?:of|=|is|measuring)?\\s*${number}\\s*(?:mm|millimet(?:er|re)s?)?`, 'i'), new RegExp(`${number}\\s*(?:mm|millimet(?:er|re)s?)?\\s*(?:wide|width)`, 'i')]), height: find([new RegExp(`(?:height|high|tall)\\s*(?:of|=|is|measuring)?\\s*${number}\\s*(?:mm|millimet(?:er|re)s?)?`, 'i'), new RegExp(`${number}\\s*(?:mm|millimet(?:er|re)s?)?\\s*(?:high|tall|height)`, 'i')]), depth: find([new RegExp(`(?:depth|deep)\\s*(?:of|=|is|measuring)?\\s*${number}\\s*(?:mm|millimet(?:er|re)s?)(?!\\s*[:/]\\s*1)`, 'i'), new RegExp(`${number}\\s*(?:mm|millimet(?:er|re)s?)?\\s*(?:deep|depth)`, 'i')]) };
 }
-function handleTextQuestion(event) {
-  event.preventDefault(); event.stopImmediatePropagation(); const box = $('question-text'), text = box?.value.trim() || '';
+async function handleTextQuestion(event) {
+  event.preventDefault(); event.stopImmediatePropagation();
+  const box = $('question-text'), text = box?.value.trim() || '';
+  const qStatus = $('question-text-status');
   if (!text) { updateStatus('Please type or paste a Technical Drawing question first.', 'error'); return; }
-  const { width, height, depth } = extractQuestionDimensions(text);
-  if ([width, height, depth].every((value) => Number.isFinite(value) && value > 0)) {
-    setFormValues({ width, height, depth }); currentAnalysisProblem = null; analysisConfirmed = false;
-    const qStatus = $('question-text-status'); if (qStatus) qStatus.textContent = `Dimensions detected: ${width} × ${height} × ${depth} mm. Generating CAD...`;
-    if (demoAnalysisBanner) demoAnalysisBanner.textContent = 'Question parsed. The CAD workspace is being prepared for the solution.';
-    renderSolution(parseProblem({ width, height, depth })); $('real-cad-workspace')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); return;
+  if (qStatus) qStatus.textContent = 'Sending question to IA-Tutor AI for drawing analysis…';
+  updateStatus('AI is interpreting the question and preparing structured CAD geometry…', 'success');
+  if (analyseButton) analyseButton.disabled = true;
+  if (confirmAnalysisButton) confirmAnalysisButton.disabled = true;
+  if (generateDrawingButton) generateDrawingButton.disabled = true;
+  analysisConfirmed = false;
+  currentAnalysisProblem = null;
+  try {
+    const response = await fetch('/api/solve-question', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: text, year: '9', subject: 'Technical Drawing' })
+    });
+    let payload = {};
+    try { payload = await response.json(); } catch (_) { payload = {}; }
+    if (!response.ok) {
+      const detail = payload.detail || 'AI drawing service is unavailable.';
+      if (response.status === 503 || String(detail).includes('CONFIGURATION')) throw new Error('AI_CONFIGURATION_ERROR: check OPENAI_API_KEY in the backend deployment settings.');
+      if (response.status === 429) throw new Error('AI_RATE_OR_BILLING_ERROR: the AI provider rejected the request due to usage limits.');
+      throw new Error(detail);
+    }
+    if (!payload.problem || typeof payload.problem !== 'object') throw new Error('The AI returned no structured drawing problem.');
+    currentAnalysisProblem = payload.problem;
+    populateAnalysisPanel(payload.problem);
+    analysisModeBanner.textContent = 'REAL AI TEXT ANALYSIS — CONFIRM REQUIRED';
+    demoAnalysisBanner.textContent = payload.message || 'Review the AI interpretation before drawing.';
+    const dims = payload.problem.dimensions || {};
+    if (['width', 'height', 'depth'].every(key => Number.isFinite(Number(dims[key])) && Number(dims[key]) > 0)) setFormValues(dims);
+    else setFormValues({});
+    confirmAnalysisButton.disabled = false;
+    generateDrawingButton.disabled = true;
+    renderRealCad({});
+    if (qStatus) qStatus.textContent = 'AI analysis ready. Review it, then click Confirm Analysis → Generate Drawing.';
+    updateStatus('Text question analysed. No drawing has been generated before your confirmation.', 'success');
+    $('analysis-results')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch (error) {
+    const message = error.message || 'AI drawing analysis failed.';
+    if (qStatus) qStatus.textContent = message;
+    updateStatus(message.includes('Failed to fetch') ? 'NETWORK ERROR: IA-Tutor could not reach the AI backend.' : message, 'error');
+  } finally {
+    if (analyseButton) analyseButton.disabled = !selectedImage;
   }
-  const problem = { drawing_type: 'Technical Drawing Question', units: 'mm', geometric_features: [text], cad_geometry: [], explanation: 'Question requires AI geometry reconstruction. Use the CAD workspace after AI analysis or upload the drawing for Vision AI.' };
-  currentAnalysisProblem = problem; analysisConfirmed = true; if (demoAnalysisBanner) demoAnalysisBanner.textContent = 'Question loaded. Upload the drawing or run AI analysis to reconstruct the exact geometry.'; if ($('question-text-status')) $('question-text-status').textContent = 'Question loaded into the open CAD workspace.'; renderRealCad(problem); $('real-cad-workspace')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); updateStatus('Open CAD workspace ready for this question.', 'success');
 }
 $('solve-text-question')?.addEventListener('click', handleTextQuestion, true);
 $('clear-question-text')?.addEventListener('click', () => { if ($('question-text')) $('question-text').value = ''; if ($('question-text-status')) $('question-text-status').textContent = ''; });
