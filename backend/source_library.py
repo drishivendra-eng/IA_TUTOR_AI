@@ -67,7 +67,7 @@ def _load_pages(source_key: str) -> tuple[dict[str, Any], ...]:
 def search_year9_sources(question: str, source_priority: str | None = None, limit: int = 5) -> dict[str, Any]:
     """Return ranked source passages and source status for a Year 9 Basic Technology question."""
     priority = (source_priority or "").lower()
-    prefer_workbook = any(term in priority for term in ("workbook", "worksheet", "sheet"))
+    prefer_workbook = any(term in priority for term in ("workbook", "worksheet", "sheet")) or bool(re.search(r"\\b(sheet|worksheet|workbook)\\s*(no\\.?\\s*)?3?\\b", question, re.I))
     preferred = ("year9_workbook", "year9_textbook") if prefer_workbook else ("year9_textbook", "year9_workbook")
     query_terms = set(_terms(question))
     matches: list[dict[str, Any]] = []
