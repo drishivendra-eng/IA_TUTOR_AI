@@ -32,7 +32,7 @@ def ask_tutor(message: str, year: str, subject: str, source_priority: str | None
     message = message.strip()
     year_text = str(year).strip()
     subject_text = str(subject).strip()
-    is_year9_basic_technology = year_text.lower().replace('year ', '').strip() in {'9', '09'} and 'basic technology' in subject_text.lower()
+    is_year9_basic_technology = year_text.lower().replace('year ', '').strip() in {'9', '09'} and any(topic in subject_text.lower() for topic in ('basic technology', 'technical drawing', 'basic graphics technology', 'industrial arts'))
 
     source_result: dict[str, Any] = {
         'matches': [],
