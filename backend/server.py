@@ -83,6 +83,8 @@ def classify_provider_error(error: OpenAIProviderError) -> tuple[int, str]:
 
 
 def classify_tutor_error(error: TutorProviderError) -> tuple[int, str]:
+    if 'CONFIGURATION' in str(error).upper():
+        return 503, 'AI_CONFIGURATION_ERROR'
     if error.status_code in (401, 403):
         return 502, 'AUTHENTICATION_ERROR'
     if error.status_code == 429:
