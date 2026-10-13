@@ -132,7 +132,7 @@ async def tutor_chat(request: TutorChatRequest) -> dict[str, Any]:
     if len(message) > 5000:
         raise HTTPException(status_code=400, detail='Question is too long.')
     try:
-        return ask_tutor(message, request.year, request.subject)
+        return ask_tutor(message, request.year, request.subject, request.sourcePriority)
     except TutorProviderError as exc:
         status_code, category = classify_tutor_error(exc)
         raise HTTPException(status_code=status_code, detail=category) from exc
@@ -171,7 +171,7 @@ async def tutor_file(
         'or paste the question if exact solving is required.'
     )
     try:
-        answer = ask_tutor(prompt, year, subject)
+        answer = ask_tutor(prompt, year, subject, sourcePriority)
         answer['file_name'] = file.filename
         answer['file_type'] = filename.rsplit('.', 1)[-1].upper() if '.' in filename else 'FILE'
         answer['document_parsed'] = False
