@@ -18,6 +18,7 @@ try:
     from backend.research_service import research
     from backend.resource_service import resolve_resource
     from backend.chat_service import TutorProviderError, ask_tutor
+    from backend.text_drawing_service import solve_text_drawing_question
 except ImportError:
     from vision_service import OpenAIProviderError, analyze_image_with_openai
     from schemas import DrawingProblemResponse
@@ -25,6 +26,7 @@ except ImportError:
     from research_service import research
     from resource_service import resolve_resource
     from chat_service import TutorProviderError, ask_tutor
+    from text_drawing_service import solve_text_drawing_question
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(PROJECT_ROOT / '.env')
@@ -119,9 +121,29 @@ class TutorChatRequest(BaseModel):
     sourcePriority: str | None = None
 
 
+class TextDrawingRequest(BaseModel):
+    question: str
+    year: str = '9'
+    subject: str = 'Technical Drawing'
+
+
 @app.get('/api/health')
 async def health() -> dict[str, Any]:
     return {'status': 'ok', 'chat': 'available', 'vision': 'available'}
+
+
+@app.post('/api/solve-question')
+async def solve_text_question(request: TextDrawingRequest) -> dict[str, Any]:
+    question = request.question.strip()
+    if len(question) < 3:
+        raise HTTPException(status_code=400, detail='Please enter a drawing question.')
+    if len(question) > 5000:
+        raise HTTPException(status_code=400, detail='Drawing question is too long.')
+    try:
+        return solve_text_drawing_question(question, request.year, request.subject)
+    except TutorProviderError as exc:
+        status_code, category = classify_tutor_error(exc)
+        raise HTTPException(status_code=status_code, detail=category) from exc
 
 
 @app.post('/api/chat')
