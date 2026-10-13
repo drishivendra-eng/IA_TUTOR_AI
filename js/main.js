@@ -60,10 +60,17 @@ function renderRealCad(problem = {}) {
   $('cad-undo').onclick = () => engine.undo(); $('cad-redo').onclick = () => engine.redo(); $('cad-reset').onclick = () => engine.clear();
   const status = host.querySelector('.cad-status'); if (status) status.textContent = geometry.length ? `AI geometry: ${geometry.length} entities` : 'Open CAD workspace';
 }
+function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char])); }
 function renderSolution(problem) {
-  if (constructionSteps) constructionSteps.innerHTML = buildConstructionSteps(problem).map((step) => `<li>${step}</li>`).join('');
-  if (drawingType) drawingType.textContent = `AI Solution • ${problem.drawing_type || 'Technical Drawing'}`;
-  publishCadSolve(problem); renderRealCad(problem); updateStatus('AI CAD solution generated successfully.', 'success');
+  const steps = Array.isArray(problem.steps) && problem.steps.length ? problem.steps : buildConstructionSteps(problem);
+  if (constructionSteps) constructionSteps.innerHTML = steps.map((step) => `<li>${escapeHtml(step)}</li>`).join('');
+  if (drawingType) drawingType.textContent = `AI Solution • ${problem.drawing_type || 'Industrial Arts Construction'}`;
+  publishCadSolve(problem);
+  renderRealCad(problem);
+  const hasCadGeometry = Array.isArray(problem.cad_geometry) && problem.cad_geometry.length > 0;
+  const hasDimensions = ['width', 'height', 'depth'].every((key) => Number.isFinite(Number(problem.dimensions?.[key])) && Number(problem.dimensions[key]) > 0);
+  if (hasCadGeometry || hasDimensions) updateStatus('CAD solution generated. Review the drawing and construction steps.', 'success');
+  else updateStatus('AI provided an interpretation, but not enough reliable geometry to draw this question. Add the missing dimensions or upload a clear worksheet image.', 'error');
 }
 function solveFromDimensions() {
   const problem = currentAnalysisProblem && analysisConfirmed ? buildGeometryProblem(currentAnalysisProblem, { width: $('width').value, height: $('height').value, depth: $('depth').value }) : parseProblem({ width: $('width').value, height: $('height').value, depth: $('depth').value });
